@@ -30,14 +30,14 @@ export const Header: React.FC<HeaderProps> = ({
           
           {/* Logo & Brand */}
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActivePage('landing')}>
-            <div className="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-all duration-300">
-              <GraduationCap className="w-6 h-6 stroke-[2.2]" />
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-all duration-300 flex-shrink-0">
+              <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold font-tajawal text-slate-800 dark:text-white tracking-tight">
+              <h1 className="text-base sm:text-xl font-bold font-tajawal text-slate-800 dark:text-white tracking-tight">
                 دليلك الجامعي
               </h1>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <span className="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-blue-500 inline" />
                 جامعتك في جيبك
               </span>
@@ -45,26 +45,26 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Action Buttons: Focus, Download ZIP, Telegram Bot, Theme Toggle */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Focus / Pomodoro Button */}
             <button
               onClick={onOpenPomodoro}
               title="مؤقت الدراسة والتركيز"
-              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all"
+              className="hidden sm:flex p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold items-center gap-1.5 transition-all"
             >
               <Timer className="w-4 h-4 text-amber-500" />
-              <span className="hidden sm:inline">التركيز</span>
+              <span>التركيز</span>
             </button>
 
             {/* Download Zip Dropdown */}
-            <div className="relative">
+            <div className="relative hidden sm:block">
               <button
                 onClick={() => setShowDownloadMenu(!showDownloadMenu)}
                 title="تحميل المشروع ZIP"
                 className="p-2 sm:px-3 sm:py-2 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center gap-1.5 transition-all border border-blue-200/60 dark:border-blue-800/60"
               >
                 <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">تحميل ZIP</span>
+                <span>تحميل ZIP</span>
               </button>
 
               {showDownloadMenu && (
@@ -104,9 +104,9 @@ export const Header: React.FC<HeaderProps> = ({
               href="http://t.me/Daleelak_AlJamaei_bot"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-sky-500/20 hover:shadow-lg hover:shadow-sky-500/30 transition-all duration-200 active:scale-95"
+              className="flex items-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-sky-500/20 hover:shadow-lg hover:shadow-sky-500/30 transition-all duration-200 active:scale-95"
             >
-              <Send className="w-4 h-4 rotate-180" />
+              <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 rotate-180" />
               <span>بوت التلجرام</span>
             </a>
 
@@ -116,62 +116,10 @@ export const Header: React.FC<HeaderProps> = ({
               className="p-2 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-200"
               aria-label="Toggle Theme"
             >
-              {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-indigo-600" />}
+              {isDark ? <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />}
             </button>
           </div>
 
-        </div>
-      </div>
-
-      {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-slate-200/80 dark:border-slate-800/80 px-4 py-2">
-        <div className="flex items-center justify-around">
-          <button
-            onClick={() => setActivePage('main')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl ${
-              activePage === 'main' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500'
-            }`}
-          >
-            <Home className="w-5 h-5" />
-            <span className="text-[10px]">الرئيسية</span>
-          </button>
-
-          <button
-            onClick={() => setActivePage('college')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl ${
-              activePage === 'college' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500'
-            }`}
-          >
-            <GraduationCap className="w-5 h-5" />
-            <span className="text-[10px]">الكلية</span>
-          </button>
-
-          <button
-            onClick={() => setActivePage('subjects')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl ${
-              activePage === 'subjects' || activePage === 'subject-detail' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500'
-            }`}
-          >
-            <BookOpen className="w-5 h-5" />
-            <span className="text-[10px]">المواد</span>
-          </button>
-
-          <button
-            onClick={() => setActivePage('schedule')}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl ${
-              activePage === 'schedule' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500'
-            }`}
-          >
-            <Calendar className="w-5 h-5" />
-            <span className="text-[10px]">الجدول</span>
-          </button>
-
-          <button
-            onClick={onOpenAddLecture}
-            className="w-10 h-10 -mt-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/40"
-          >
-            <Plus className="w-6 h-6" />
-          </button>
         </div>
       </div>
     </header>
