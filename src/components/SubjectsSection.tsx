@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SUBJECTS_DATA } from '../data/academicContent';
 import { Subject, SubjectId } from '../types';
 import { BookOpen, ArrowLeft, ArrowRight, Search, Sparkles, Activity, HeartPulse, Dna, Bug, Stethoscope, Pill, CheckCircle, FileText, ChevronLeft } from 'lucide-react';
 import { SubjectDetailView } from './SubjectDetailView';
+import { FirebaseService } from '../services/firebase';
 
 interface SubjectsSectionProps {
   onBack: () => void;
@@ -11,12 +12,22 @@ interface SubjectsSectionProps {
 }
 
 export const SubjectsSection: React.FC<SubjectsSectionProps> = ({ onBack, initialSelectedId }) => {
-  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(
-    initialSelectedId ? SUBJECTS_DATA.find(s => s.id === initialSelectedId) || null : null
-  );
+  const [subjectsList, setSubjectsList] = useState<Subject[]>(SUBJECTS_DATA);
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredSubjects = SUBJECTS_DATA.filter(s => 
+  useEffect(() => {
+    const unsubscribe = FirebaseService.subscribeSubjects((data) => {
+      setSubjectsList(data);
+      if (initialSelectedId && !selectedSubject) {
+        const found = data.find(s => s.id === initialSelectedId);
+        if (found) setSelectedSubject(found);
+      }
+    });
+    return () => unsubscribe();
+  }, [initialSelectedId]);
+
+  const filteredSubjects = subjectsList.filter(s => 
     s.nameAr.includes(searchQuery) || 
     s.nameEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.description.includes(searchQuery)

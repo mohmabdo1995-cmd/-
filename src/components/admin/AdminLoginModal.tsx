@@ -102,13 +102,13 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onSuccess, onC
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-              كلمة المرور (Password):
+              كلمة المرور:
             </label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 disabled={isLockedOut}
-                placeholder="أدخل كلمة المرور 20052026..."
+                placeholder="أدخل كلمة المرور"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-10 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-50"
@@ -118,6 +118,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onSuccess, onC
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute left-3 top-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                title={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>

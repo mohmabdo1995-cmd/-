@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ActivePage } from '../types';
-import { GraduationCap, BookOpen, CalendarCheck, ArrowLeft, Send, Sparkles, Clock, CheckCircle2, Bookmark, BellRing, ChevronLeft, Zap, Layers } from 'lucide-react';
+import { GraduationCap, BookOpen, CalendarCheck, ArrowLeft, Send, Sparkles, Clock, CheckCircle2, Bookmark, BellRing, ChevronLeft, Zap, Layers, FileText, Video } from 'lucide-react';
 
 interface MainDashboardProps {
   onNavigate: (page: ActivePage) => void;
@@ -30,14 +30,14 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-right"
       >
         <div>
-          <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-xs mb-1">
+          <div className="flex items-center gap-2 text-blue-600 font-bold text-xs mb-1">
             <Sparkles className="w-4 h-4 text-amber-500" />
             <span>تصميم شبكي تفاعلي • Bento Grid</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold font-tajawal text-slate-800 dark:text-white tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold font-tajawal text-slate-800 tracking-tight">
             لوحة تحكم دليلك الجامعي 🎓
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+          <p className="text-slate-500 text-sm mt-1">
             تصفح الخدمات والأقسام الأكاديمية والمحاضرات بأسلوب منظم وسريع
           </p>
         </div>
@@ -54,6 +54,43 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
           </a>
         </div>
       </motion.div>
+
+      {/* Quick Access Bar for Articles & Videos */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <motion.div
+          whileHover={{ scale: 1.01 }}
+          onClick={() => onNavigate('articles')}
+          className="p-5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md cursor-pointer flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+              <FileText className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-extrabold font-tajawal text-base">المقالات والأبحاث الأكاديمية</h4>
+              <p className="text-xs text-blue-100">استعرض أحدث المقالات والإرشادات الطبية والتعليمية</p>
+            </div>
+          </div>
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+        </motion.div>
+
+        <motion.div
+          whileHover={{ scale: 1.01 }}
+          onClick={() => onNavigate('videos')}
+          className="p-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-700 text-white shadow-md cursor-pointer flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+              <Video className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-extrabold font-tajawal text-base">المكتبة المرئية والفيديوهات</h4>
+              <p className="text-xs text-indigo-100">شروحات ومحاضرات فيديو مسجلة مع مشغل تفاعلي</p>
+            </div>
+          </div>
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+        </motion.div>
+      </div>
 
       {/* Bento Grid Layout Main Matrix */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

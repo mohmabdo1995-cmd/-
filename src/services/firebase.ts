@@ -15,7 +15,8 @@ import {
   limit
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
-import { Subject, Lecture, StudyResource } from '../types';
+import { Subject, Lecture, StudyResource, ArticleItem, VideoItem, CollegeInfoData } from '../types';
+import { COLLEGE_INFO, SUBJECTS_DATA } from '../data/academicContent';
 
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
@@ -31,6 +32,8 @@ export interface SectionVisibility {
   subjectsSection: boolean;
   scheduleSection: boolean;
   resourcesSection: boolean;
+  articlesSection: boolean;
+  videosSection: boolean;
   gpaCalculator: boolean;
   pomodoroTimer: boolean;
   announcementsBanner: boolean;
@@ -62,6 +65,7 @@ export interface MediaItem {
   url: string;
   type: 'image' | 'pdf' | 'video' | 'logo';
   size?: string;
+  category?: string;
   visible: boolean;
   createdAt: string;
 }
@@ -128,6 +132,8 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     subjectsSection: true,
     scheduleSection: true,
     resourcesSection: true,
+    articlesSection: true,
+    videosSection: true,
     gpaCalculator: true,
     pomodoroTimer: true,
     announcementsBanner: true,
@@ -143,6 +149,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
 };
 
 const SITE_CONFIG_DOC_ID = 'general';
+const COLLEGE_INFO_DOC_ID = 'about_college';
 
 export class FirebaseService {
   // 1. Subscribe to Site Config Real-time Updates
@@ -202,7 +209,180 @@ export class FirebaseService {
     }
   }
 
-  // 4. Announcements & Ads Manager
+  // 4. Articles Management
+  static subscribeArticles(callback: (articles: ArticleItem[]) => void): () => void {
+    const colRef = collection(db, 'articles');
+    return onSnapshot(colRef, (snapshot) => {
+      const articles: ArticleItem[] = [];
+      snapshot.forEach(docSnap => {
+        articles.push({ id: docSnap.id, ...docSnap.data() } as ArticleItem);
+      });
+      articles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      callback(articles);
+    }, (err) => {
+      console.warn('Articles snapshot error:', err);
+      callback([]);
+    });
+  }
+
+  static async addArticle(item: Omit<ArticleItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+    const colRef = collection(db, 'articles');
+    const now = new Date().toISOString();
+    const docRef = await addDoc(colRef, {
+      ...item,
+      createdAt: now,
+      updatedAt: now
+    });
+    await this.addAdminLog('إضافة مقال جديد', `عنوان المقال: ${item.title} (${item.status})`);
+    return docRef.id;
+  }
+
+  static async updateArticle(id: string, partial: Partial<ArticleItem>): Promise<void> {
+    const docRef = doc(db, 'articles', id);
+    await updateDoc(docRef, {
+      ...partial,
+      updatedAt: new Date().toISOString()
+    });
+    await this.addAdminLog('تحديث مقال', `معرف المقال: ${id}`);
+  }
+
+  static async deleteArticle(id: string): Promise<void> {
+    const docRef = doc(db, 'articles', id);
+    await deleteDoc(docRef);
+    await this.addAdminLog('حذف مقال', `معرف المقال: ${id}`);
+  }
+
+  // 5. Video Management
+  static subscribeVideos(callback: (videos: VideoItem[]) => void): () => void {
+    const colRef = collection(db, 'videos');
+    return onSnapshot(colRef, (snapshot) => {
+      const videos: VideoItem[] = [];
+      snapshot.forEach(docSnap => {
+        videos.push({ id: docSnap.id, ...docSnap.data() } as VideoItem);
+      });
+      videos.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      callback(videos);
+    }, (err) => {
+      console.warn('Videos snapshot error:', err);
+      callback([]);
+    });
+  }
+
+  static async addVideo(item: Omit<VideoItem, 'id' | 'createdAt'>): Promise<string> {
+    const colRef = collection(db, 'videos');
+    const docRef = await addDoc(colRef, {
+      ...item,
+      createdAt: new Date().toISOString()
+    });
+    await this.addAdminLog('إضافة فيديو جديد', `عنوان الفيديو: ${item.title}`);
+    return docRef.id;
+  }
+
+  static async updateVideo(id: string, partial: Partial<VideoItem>): Promise<void> {
+    const docRef = doc(db, 'videos', id);
+    await updateDoc(docRef, partial);
+    await this.addAdminLog('تحديث فيديو', `معرف الفيديو: ${id}`);
+  }
+
+  static async deleteVideo(id: string): Promise<void> {
+    const docRef = doc(db, 'videos', id);
+    await deleteDoc(docRef);
+    await this.addAdminLog('حذف فيديو', `معرف الفيديو: ${id}`);
+  }
+
+  // 6. About College Section Info
+  static subscribeCollegeInfo(callback: (data: CollegeInfoData) => void): () => void {
+    const docRef = doc(db, 'college_info', COLLEGE_INFO_DOC_ID);
+    return onSnapshot(docRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data() as CollegeInfoData;
+        callback({
+          title: data.title || COLLEGE_INFO.title,
+          tagline: data.tagline || COLLEGE_INFO.tagline,
+          image: data.image || COLLEGE_INFO.image,
+          overview: data.overview || COLLEGE_INFO.overview,
+          creditSystem: data.creditSystem || COLLEGE_INFO.creditSystem,
+          survivalTips: data.survivalTips && data.survivalTips.length > 0
+            ? data.survivalTips
+            : COLLEGE_INFO.survivalTips.map((t, idx) => ({ id: 'tip-' + idx, ...t })),
+          customSections: data.customSections || []
+        });
+      } else {
+        const initialDefault: CollegeInfoData = {
+          title: COLLEGE_INFO.title,
+          tagline: COLLEGE_INFO.tagline,
+          image: COLLEGE_INFO.image,
+          overview: COLLEGE_INFO.overview,
+          creditSystem: COLLEGE_INFO.creditSystem,
+          survivalTips: COLLEGE_INFO.survivalTips.map((t, idx) => ({ id: 'tip-' + idx, ...t })),
+          customSections: []
+        };
+        setDoc(docRef, initialDefault);
+        callback(initialDefault);
+      }
+    }, (err) => {
+      console.warn('College info snapshot error:', err);
+      callback({
+        title: COLLEGE_INFO.title,
+        tagline: COLLEGE_INFO.tagline,
+        image: COLLEGE_INFO.image,
+        overview: COLLEGE_INFO.overview,
+        creditSystem: COLLEGE_INFO.creditSystem,
+        survivalTips: COLLEGE_INFO.survivalTips.map((t, idx) => ({ id: 'tip-' + idx, ...t })),
+        customSections: []
+      });
+    });
+  }
+
+  static async updateCollegeInfo(data: Partial<CollegeInfoData>): Promise<void> {
+    const docRef = doc(db, 'college_info', COLLEGE_INFO_DOC_ID);
+    await setDoc(docRef, data, { merge: true });
+    await this.addAdminLog('تحديث قسم الكلية', 'تم تعديل ومعالجة معلومات عن الكلية');
+  }
+
+  // 7. Academic Subjects Data
+  static subscribeSubjects(callback: (subjects: Subject[]) => void): () => void {
+    const colRef = collection(db, 'subjects_data');
+    return onSnapshot(colRef, (snapshot) => {
+      if (!snapshot.empty) {
+        const subjects: Subject[] = [];
+        snapshot.forEach(docSnap => {
+          subjects.push({ id: docSnap.id, ...docSnap.data() } as Subject);
+        });
+        callback(subjects);
+      } else {
+        // Populate default subjects if empty
+        SUBJECTS_DATA.forEach(async (sub) => {
+          const docRef = doc(db, 'subjects_data', sub.id);
+          await setDoc(docRef, sub);
+        });
+        callback(SUBJECTS_DATA);
+      }
+    }, (err) => {
+      console.warn('Subjects snapshot error:', err);
+      callback(SUBJECTS_DATA);
+    });
+  }
+
+  static async addSubject(sub: Subject): Promise<void> {
+    const docRef = doc(db, 'subjects_data', sub.id);
+    await setDoc(docRef, sub);
+    await this.addAdminLog('إضافة مادة أكاديمية', `اسم المادة: ${sub.nameAr}`);
+  }
+
+  static async updateSubject(id: string, partial: Partial<Subject>): Promise<void> {
+    const docRef = doc(db, 'subjects_data', id);
+    await updateDoc(docRef, partial);
+    await this.addAdminLog('تحديث مادة أكاديمية', `معرف المادة: ${id}`);
+  }
+
+  static async deleteSubject(id: string): Promise<void> {
+    const docRef = doc(db, 'subjects_data', id);
+    await deleteDoc(docRef);
+    await this.addAdminLog('حذف مادة أكاديمية', `معرف المادة: ${id}`);
+  }
+
+  // 8. Announcements & Ads Manager
   static subscribeAnnouncements(callback: (items: AnnouncementItem[]) => void): () => void {
     const colRef = collection(db, 'announcements');
     return onSnapshot(colRef, (snapshot) => {
@@ -238,7 +418,7 @@ export class FirebaseService {
     await this.addAdminLog('حذف إعلان', `معرف الإعلان: ${id}`);
   }
 
-  // 5. Media & Assets Manager
+  // 9. Media & Assets Manager
   static subscribeMedia(callback: (items: MediaItem[]) => void): () => void {
     const colRef = collection(db, 'media');
     return onSnapshot(colRef, (snapshot) => {
@@ -274,7 +454,7 @@ export class FirebaseService {
     await this.addAdminLog('حذف ملف ميديا', `معرف الملف: ${id}`);
   }
 
-  // 6. Admin Action Audit Logs
+  // 10. Admin Action Audit Logs
   static subscribeAdminLogs(callback: (logs: AdminLogItem[]) => void): () => void {
     const colRef = collection(db, 'admin_logs');
     return onSnapshot(colRef, (snapshot) => {
@@ -304,7 +484,7 @@ export class FirebaseService {
     }
   }
 
-  // 7. Full Backup JSON Export & Import
+  // 11. Full Backup JSON Export & Import
   static async exportFullData(): Promise<string> {
     const docRef = doc(db, 'site_config', SITE_CONFIG_DOC_ID);
     const snap = await getDoc(docRef);
@@ -316,11 +496,19 @@ export class FirebaseService {
     const mediaSnap = await getDocs(collection(db, 'media'));
     const mediaData = mediaSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
+    const artSnap = await getDocs(collection(db, 'articles'));
+    const artData = artSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    const vidSnap = await getDocs(collection(db, 'videos'));
+    const vidData = vidSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
     const backupPayload = {
       exportedAt: new Date().toISOString(),
       siteConfig: siteConfigData,
       announcements: annData,
-      media: mediaData
+      media: mediaData,
+      articles: artData,
+      videos: vidData
     };
 
     return JSON.stringify(backupPayload, null, 2);
@@ -334,3 +522,4 @@ export class FirebaseService {
     await this.addAdminLog('استعادة نسخة احتياطية', 'تم استيراد نسخة البيانات بنجاح');
   }
 }
+

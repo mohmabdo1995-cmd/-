@@ -142,7 +142,7 @@ export class StorageService {
       if (data) return JSON.parse(data);
     } catch (e) {}
     return {
-      theme: 'dark',
+      theme: 'light',
       notificationsEnabled: true,
       soundEnabled: true,
       activeView: 'landing'

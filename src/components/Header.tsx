@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { ActivePage } from '../types';
-import { BookOpen, Calendar, Send, Sun, Moon, Bell, GraduationCap, Home, Sparkles, Plus, Calculator, Timer, Download, PackageCheck } from 'lucide-react';
+import { BookOpen, Calendar, Send, Bell, GraduationCap, Home, Sparkles, Plus, Calculator, Timer, Download, PackageCheck } from 'lucide-react';
 
 interface HeaderProps {
   activePage: ActivePage;
   setActivePage: (page: ActivePage) => void;
-  isDark: boolean;
-  toggleTheme: () => void;
   onOpenGpa: () => void;
   onOpenPomodoro: () => void;
   onOpenAddLecture: () => void;
@@ -15,8 +13,6 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   activePage,
   setActivePage,
-  isDark,
-  toggleTheme,
   onOpenGpa,
   onOpenPomodoro,
   onOpenAddLecture
@@ -109,15 +105,6 @@ export const Header: React.FC<HeaderProps> = ({
               <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 rotate-180" />
               <span>بوت التلجرام</span>
             </a>
-
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-200"
-              aria-label="Toggle Theme"
-            >
-              {isDark ? <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />}
-            </button>
           </div>
 
         </div>
