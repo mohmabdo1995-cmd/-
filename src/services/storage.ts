@@ -7,68 +7,21 @@ const STORAGE_KEYS = {
   TASKS: 'daleelak_tasks_v1'
 };
 
-// Initial default demo lectures if empty
-const INITIAL_LECTURES: Lecture[] = [
-  {
-    id: 'demo-1',
-    title: 'Anatomy Lecture: Upper Limb Nerve Supply',
-    subject: 'Anatomy',
-    professor: 'أ.د. محمد أحمد',
-    hall: 'المدرج المركزي A',
-    date: new Date().toISOString().split('T')[0],
-    time: '09:00',
-    dayOfWeek: 'الأحد',
-    notes: 'مراجعة الأعصاب الرئيسية وشلل الضفيرة العضدية (Brachial Plexus).',
-    priority: 'high',
-    completed: false,
-    notificationEnabled: true,
-    createdAt: Date.now()
-  },
-  {
-    id: 'demo-2',
-    title: 'Physiology: Cardiac Cycle & ECG Waves',
-    subject: 'Physiology',
-    professor: 'د. سارة الكردي',
-    hall: 'قاعة 204',
-    date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-    time: '11:00',
-    dayOfWeek: 'الإثنين',
-    notes: 'إحضار آلة حاسبة لحساب معدل ضربات القلب وحجوم الدم.',
-    priority: 'medium',
-    completed: false,
-    notificationEnabled: true,
-    createdAt: Date.now() - 10000
-  },
-  {
-    id: 'demo-3',
-    title: 'Biochemistry: Glycolysis & Krebs Cycle',
-    subject: 'Biochemistry',
-    professor: 'أ.د. علي الشريف',
-    hall: 'مختبر الكيمياء الحيوية',
-    date: new Date(Date.now() + 172800000).toISOString().split('T')[0],
-    time: '13:30',
-    dayOfWeek: 'الثلاثاء',
-    notes: 'تحديد الإنزيمات المحددة لسرعة التفاعل.',
-    priority: 'high',
-    completed: false,
-    notificationEnabled: true,
-    createdAt: Date.now() - 20000
-  }
-];
-
 export class StorageService {
   // --- Lectures ---
   static getLectures(): Lecture[] {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.LECTURES);
       if (!data) {
-        this.saveLectures(INITIAL_LECTURES);
-        return INITIAL_LECTURES;
+        return [];
       }
-      return JSON.parse(data);
+      const parsed: Lecture[] = JSON.parse(data);
+      if (!Array.isArray(parsed)) return [];
+      // Clean up legacy demo items if any exist
+      return parsed.filter(l => l && l.id && !l.id.startsWith('demo-'));
     } catch (e) {
       console.error('Error reading lectures from storage:', e);
-      return INITIAL_LECTURES;
+      return [];
     }
   }
 

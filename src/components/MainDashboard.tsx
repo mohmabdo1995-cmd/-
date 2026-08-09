@@ -1,18 +1,20 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ActivePage } from '../types';
-import { GraduationCap, BookOpen, CalendarCheck, ArrowLeft, Send, Sparkles, Clock, CheckCircle2, Bookmark, BellRing, ChevronLeft, Zap, Layers, FileText, Video } from 'lucide-react';
+import { ActivePage, Lecture } from '../types';
+import { GraduationCap, BookOpen, CalendarCheck, ArrowLeft, Send, Sparkles, Clock, CheckCircle2, Bookmark, BellRing, ChevronLeft, Zap, Layers, FileText, Video, Calendar } from 'lucide-react';
 
 interface MainDashboardProps {
   onNavigate: (page: ActivePage) => void;
   lectureCount: number;
   upcomingCount: number;
+  lectures?: Lecture[];
 }
 
 export const MainDashboard: React.FC<MainDashboardProps> = ({
   onNavigate,
   lectureCount,
-  upcomingCount
+  upcomingCount,
+  lectures = []
 }) => {
   const currentDateFormatted = new Date().toLocaleDateString('ar-EG', {
     weekday: 'long',
@@ -133,52 +135,64 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
           </div>
         </motion.div>
 
-        {/* Bento Box 2: Schedule Dark Card (Col 4) */}
+        {/* Bento Box 2: Schedule Card (Col 4) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="lg:col-span-4 bg-slate-900 border border-slate-800 text-white rounded-[2rem] p-6 shadow-xl flex flex-col justify-between"
+          className="lg:col-span-4 bg-white border border-slate-200/90 text-slate-800 rounded-[2rem] p-6 shadow-sm flex flex-col justify-between"
         >
           <div>
-            <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-800">
-              <h3 className="text-white font-bold text-base font-tajawal flex items-center gap-2">
-                <Clock className="w-5 h-5 text-blue-400" />
+            <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+              <h3 className="text-slate-900 font-bold text-base font-tajawal flex items-center gap-2">
+                <Clock className="w-5 h-5 text-blue-600" />
                 <span>الجدول الدراسي</span>
               </h3>
               <span className="text-slate-400 text-xs font-mono">{currentDateFormatted}</span>
             </div>
 
-            <div className="space-y-3 mb-6">
-              <div className="flex gap-3 items-center p-2.5 rounded-xl bg-slate-800/60 border-r-4 border-blue-500">
-                <div className="text-slate-400 text-[11px] font-mono w-14">08:30 ص</div>
-                <div>
-                  <p className="text-white text-xs font-bold">Anatomy (علم التشريح)</p>
-                  <p className="text-blue-300 text-[10px]">المدرج الرئيسي - د. المحاضر</p>
+            {lectures.length === 0 ? (
+              <div className="my-6 py-6 text-center flex flex-col items-center justify-center space-y-2">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-1">
+                  <Calendar className="w-6 h-6" />
                 </div>
+                <p className="text-slate-800 font-bold text-sm font-tajawal">لا توجد محاضرات حالياً</p>
+                <p className="text-slate-400 text-xs max-w-[220px]">
+                  لم يتم إضافة أي محاضرات في جدول التذكير بعد
+                </p>
               </div>
-
-              <div className="flex gap-3 items-center p-2.5 rounded-xl bg-slate-800/60 border-r-4 border-emerald-500">
-                <div className="text-slate-400 text-[11px] font-mono w-14">10:45 ص</div>
-                <div>
-                  <p className="text-white text-xs font-bold">Physiology (وظائف الأعضاء)</p>
-                  <p className="text-emerald-300 text-[10px]">قاعة المحاضرات A3</p>
-                </div>
+            ) : (
+              <div className="space-y-3 mb-6 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
+                {lectures.slice(0, 4).map((lec) => {
+                  const todayStr = new Date().toISOString().split('T')[0];
+                  return (
+                    <div key={lec.id} className="flex gap-3 items-center p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                      <div className="text-blue-600 font-bold text-[11px] font-mono w-14 flex-shrink-0 text-center bg-blue-50/80 py-1 rounded-lg border border-blue-100/60">
+                        {lec.time}
+                      </div>
+                      <div className="flex-1 min-w-0 text-right">
+                        <p className={`text-xs font-bold font-tajawal truncate ${lec.completed ? 'line-through text-slate-400' : 'text-slate-900'}`}>
+                          {lec.title}
+                        </p>
+                        <p className="text-slate-500 text-[10px] truncate mt-0.5">
+                          {lec.subject} {lec.hall ? `• ${lec.hall}` : ''} {lec.professor ? `• ${lec.professor}` : ''}
+                        </p>
+                      </div>
+                      {lec.date === todayStr && (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white font-bold text-[9px] flex-shrink-0">
+                          اليوم
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-
-              <div className="flex gap-3 items-center p-2.5 rounded-xl bg-slate-800/60 border-r-4 border-amber-500">
-                <div className="text-slate-400 text-[11px] font-mono w-14">01:00 م</div>
-                <div>
-                  <p className="text-white text-xs font-bold">Biochemistry (الكيمياء)</p>
-                  <p className="text-amber-300 text-[10px]">المختبر الأكاديمي</p>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
 
           <button
             onClick={() => onNavigate('schedule')}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 active:scale-95"
           >
             <span>عرض وإدارة الجدول الكامل</span>
             <ArrowLeft className="w-4 h-4" />

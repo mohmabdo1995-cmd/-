@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getFirestore,
+  initializeFirestore,
   doc,
   getDoc,
   setDoc,
@@ -18,9 +19,13 @@ import firebaseConfig from '../../firebase-applet-config.json';
 import { Subject, Lecture, StudyResource, ArticleItem, VideoItem, CollegeInfoData } from '../types';
 import { COLLEGE_INFO, SUBJECTS_DATA } from '../data/academicContent';
 
-// Initialize Firebase
+// Initialize Firebase with long polling fallback for reliable connection
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || undefined);
+export const db = initializeFirestore(
+  app,
+  { experimentalAutoDetectLongPolling: true },
+  firebaseConfig.firestoreDatabaseId || undefined
+);
 
 // Types for Admin & Dynamic Site Config
 export interface SectionVisibility {

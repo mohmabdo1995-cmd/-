@@ -12,12 +12,13 @@ import confetti from 'canvas-confetti';
 interface ScheduleSectionProps {
   onBack: () => void;
   openAddModalInitially?: boolean;
+  onLecturesUpdated?: () => void;
 }
 
 const DAYS_OF_WEEK = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 const SUBJECT_OPTIONS = ['Anatomy', 'Physiology', 'Biochemistry', 'Microbiology', 'Pathology', 'Pharmacology', 'عام / مقرر آخر'];
 
-export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAddModalInitially = false }) => {
+export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAddModalInitially = false, onLecturesUpdated }) => {
   const [lectures, setLectures] = useState<Lecture[]>([]);
   const [filterTab, setFilterTab] = useState<'all' | 'today' | 'upcoming' | 'past'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -135,6 +136,7 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
     }
 
     loadLectures();
+    onLecturesUpdated?.();
     setIsModalOpen(false);
     resetForm();
     confetti({ particleCount: 40, spread: 50 });
@@ -144,12 +146,14 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
     if (confirm('هل أنت تأكد من رغبتك في حذف هذه المحاضرة؟')) {
       StorageService.deleteLecture(id);
       loadLectures();
+      onLecturesUpdated?.();
     }
   };
 
   const handleToggleCompleted = (id: string) => {
     StorageService.toggleLectureCompleted(id);
     loadLectures();
+    onLecturesUpdated?.();
   };
 
   const handleTestNotification = (lec: Lecture) => {

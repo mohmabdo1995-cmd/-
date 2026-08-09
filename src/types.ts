@@ -92,7 +92,7 @@ export interface GpaCourse {
 }
 
 export interface UserSettings {
-  theme: 'light';
+  theme: 'light' | 'dark';
   notificationsEnabled: boolean;
   soundEnabled: boolean;
   activeView: ActivePage;

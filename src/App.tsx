@@ -67,17 +67,13 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Load Settings & Theme on Mount
+  // Enforce Light Mode & Load Settings/Lectures on Mount
   useEffect(() => {
-    const savedSettings = StorageService.getSettings();
-    setIsDark(savedSettings.theme === 'dark');
-    if (savedSettings.theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    // Force Light Mode on desktop and site-wide
+    document.documentElement.classList.remove('dark');
+    StorageService.saveSettings({ theme: 'light' });
 
-    // Refresh lectures count
+    // Refresh lectures
     const lecs = StorageService.getLectures();
     setLectures(lecs);
 
@@ -90,14 +86,8 @@ export default function App() {
   }, []);
 
   const toggleTheme = () => {
-    const nextTheme = !isDark;
-    setIsDark(nextTheme);
-    if (nextTheme) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    StorageService.saveSettings({ theme: nextTheme ? 'dark' : 'light' });
+    document.documentElement.classList.remove('dark');
+    StorageService.saveSettings({ theme: 'light' });
   };
 
   const handleNavigate = (page: ActivePage, subjectId?: SubjectId) => {
@@ -169,6 +159,7 @@ export default function App() {
             onNavigate={(p) => handleNavigate(p)}
             lectureCount={lectures.length}
             upcomingCount={upcomingCount}
+            lectures={lectures}
           />
         )}
 
@@ -190,6 +181,7 @@ export default function App() {
           <ScheduleSection
             onBack={() => handleNavigate('main')}
             openAddModalInitially={openScheduleAddModal}
+            onLecturesUpdated={() => setLectures(StorageService.getLectures())}
           />
         )}
 
