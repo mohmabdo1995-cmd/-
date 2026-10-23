@@ -29,6 +29,16 @@ export interface VideoItem {
   createdAt: string;
 }
 
+export interface TickerItem {
+  id: string;
+  text: string;
+  badge?: string;
+  link?: string;
+  visible: boolean;
+  order: number;
+  createdAt: string;
+}
+
 export interface CollegeInfoData {
   title: string;
   tagline: string;

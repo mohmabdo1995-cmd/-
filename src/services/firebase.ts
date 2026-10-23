@@ -16,7 +16,7 @@ import {
   limit
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
-import { Subject, Lecture, StudyResource, ArticleItem, VideoItem, CollegeInfoData } from '../types';
+import { Subject, Lecture, StudyResource, ArticleItem, VideoItem, CollegeInfoData, TickerItem } from '../types';
 import { COLLEGE_INFO, SUBJECTS_DATA, DEFAULT_ARTICLES, DEFAULT_VIDEOS } from '../data/academicContent';
 
 // Initialize Firebase with long polling fallback for reliable connection
@@ -29,6 +29,7 @@ export const db = initializeFirestore(
 
 // Types for Admin & Dynamic Site Config
 export interface SectionVisibility {
+  newsTicker: boolean;
   heroSection: boolean;
   heroStats: boolean;
   heroButtons: boolean;
@@ -105,7 +106,48 @@ export interface SiteConfig {
   seoKeywords: string;
   sectionVisibility: SectionVisibility;
   buttons: ButtonConfig[];
+  tickerSpeed?: 'slow' | 'normal' | 'fast';
+  tickerTitle?: string;
 }
+
+export const DEFAULT_TICKER_ITEMS: TickerItem[] = [
+  {
+    id: 'ticker-1',
+    text: 'مرحباً بكم في منصة دليلك الجامعي الأكاديمية الشاملة لكليتنا',
+    badge: 'ترحيب',
+    link: 'main',
+    visible: true,
+    order: 1,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'ticker-2',
+    text: 'تم إطلاق ميزة التقويم الشهري التفاعلي الجديد في قسم الجدول الدراسي',
+    badge: 'جديد',
+    link: 'schedule',
+    visible: true,
+    order: 2,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'ticker-3',
+    text: 'يمكنك الآن تفعيل الإشعارات اللحظية للتذكير بمواعيد المحاضرات الأكاديمية والامتحانات',
+    badge: 'تنبيه',
+    link: 'schedule',
+    visible: true,
+    order: 3,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'ticker-4',
+    text: 'انضم إلى بوت وقناة التلجرام الرسمية للحصول على أحدث الملخصات والمراجع والمحاضرات',
+    badge: 'هام',
+    link: 'http://t.me/Daleelak_AlJamaei_bot',
+    visible: true,
+    order: 4,
+    createdAt: new Date().toISOString()
+  }
+];
 
 export const DEFAULT_SITE_CONFIG: SiteConfig = {
   siteTitle: 'دليلك الجامعي',
@@ -128,7 +170,10 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   seoTitle: 'دليلك الجامعي - جامعتك في جيبك',
   seoDescription: 'دليل رقمي شامل للطلاب الجامعيين لتنظيم المحاضرات وتصفح المواد والمصادر.',
   seoKeywords: 'جامعة, محاضرات, طب, تشريح, وظائف أعضاء, كيمياء حيوية, جدول دراسي, GPA',
+  tickerSpeed: 'normal',
+  tickerTitle: 'شريط الأخبار والتنبيهات',
   sectionVisibility: {
+    newsTicker: true,
     heroSection: true,
     heroStats: true,
     heroButtons: true,
@@ -529,7 +574,66 @@ export class FirebaseService {
     }
   }
 
-  // 11. Full Backup JSON Export & Import
+  // 11. News Ticker (شريط الأخبار المتحرك)
+  static subscribeTicker(callback: (items: TickerItem[]) => void): () => void {
+    const colRef = collection(db, 'ticker_items');
+    return onSnapshot(colRef, (snapshot) => {
+      if (!snapshot.empty) {
+        const items: TickerItem[] = [];
+        snapshot.forEach(docSnap => {
+          items.push({ id: docSnap.id, ...docSnap.data() } as TickerItem);
+        });
+        items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        callback(items);
+      } else {
+        // If empty in Firestore, populate default ticker items and return them
+        DEFAULT_TICKER_ITEMS.forEach(async (item) => {
+          try {
+            const docRef = doc(db, 'ticker_items', item.id);
+            await setDoc(docRef, item);
+          } catch (e) {
+            console.warn('Error populating default ticker item:', e);
+          }
+        });
+        callback(DEFAULT_TICKER_ITEMS);
+      }
+    }, (err) => {
+      console.warn('Ticker snapshot error, fallback to defaults:', err);
+      callback(DEFAULT_TICKER_ITEMS);
+    });
+  }
+
+  static async addTickerItem(item: Omit<TickerItem, 'id' | 'createdAt'>): Promise<string> {
+    const colRef = collection(db, 'ticker_items');
+    const docRef = await addDoc(colRef, {
+      ...item,
+      createdAt: new Date().toISOString()
+    });
+    await this.addAdminLog('إضافة خبر للشريط المتحرك', `نص الخبر: ${item.text.slice(0, 40)}...`);
+    return docRef.id;
+  }
+
+  static async updateTickerItem(id: string, partial: Partial<TickerItem>): Promise<void> {
+    const docRef = doc(db, 'ticker_items', id);
+    await updateDoc(docRef, partial);
+    await this.addAdminLog('تحديث خبر في الشريط المتحرك', `معرف الخبر: ${id}`);
+  }
+
+  static async deleteTickerItem(id: string): Promise<void> {
+    const docRef = doc(db, 'ticker_items', id);
+    await deleteDoc(docRef);
+    await this.addAdminLog('حذف خبر من الشريط المتحرك', `معرف الخبر: ${id}`);
+  }
+
+  static async seedDefaultTickerItems(): Promise<void> {
+    for (const item of DEFAULT_TICKER_ITEMS) {
+      const docRef = doc(db, 'ticker_items', item.id);
+      await setDoc(docRef, item);
+    }
+    await this.addAdminLog('استعادة شريط الأخبار الافتراضي', 'تم استرجاع الأخبار النموذجية لشريط الأخبار');
+  }
+
+  // 12. Full Backup JSON Export & Import
   static async exportFullData(): Promise<string> {
     const docRef = doc(db, 'site_config', SITE_CONFIG_DOC_ID);
     const snap = await getDoc(docRef);
@@ -547,13 +651,17 @@ export class FirebaseService {
     const vidSnap = await getDocs(collection(db, 'videos'));
     const vidData = vidSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
+    const tickSnap = await getDocs(collection(db, 'ticker_items'));
+    const tickData = tickSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
     const backupPayload = {
       exportedAt: new Date().toISOString(),
       siteConfig: siteConfigData,
       announcements: annData,
       media: mediaData,
       articles: artData,
-      videos: vidData
+      videos: vidData,
+      tickerItems: tickData
     };
 
     return JSON.stringify(backupPayload, null, 2);

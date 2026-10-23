@@ -1,5 +1,5 @@
 // Daleelak AlJamaei (دليلك الجامعي) - High-Reliability PWA Service Worker
-const CACHE_VERSION = 'v2.3.0';
+const CACHE_VERSION = 'v2.4.0';
 const STATIC_CACHE_NAME = `daleelak-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE_NAME = `daleelak-dynamic-${CACHE_VERSION}`;
 const FONT_CACHE_NAME = `daleelak-fonts-${CACHE_VERSION}`;
@@ -62,10 +62,11 @@ self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
-  // 1. Ignore non-GET, non-HTTP requests, and Firebase backend API calls
+  // 1. Bypass non-GET, non-HTTP, WebSocket, and Firebase backend API calls
   if (
     request.method !== 'GET' ||
     !url.protocol.startsWith('http') ||
+    request.headers.get('upgrade') === 'websocket' ||
     url.hostname.includes('firestore.googleapis.com') ||
     url.hostname.includes('identitytoolkit.googleapis.com') ||
     url.hostname.includes('securetoken.googleapis.com')
@@ -73,7 +74,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Google Fonts & Static CDN Fonts (Cache-First with Network Fallback)
+  // 2. CRITICAL: Bypass Vite dev server internal endpoints and hot-update queries completely
+  if (
+    url.pathname.startsWith('/@') ||
+    url.pathname.startsWith('/src/') ||
+    url.pathname.startsWith('/node_modules/') ||
+    url.searchParams.has('t') ||
+    url.searchParams.has('v') ||
+    url.searchParams.has('import')
+  ) {
+    return;
+  }
+
+  // 3. Google Fonts & Static CDN Fonts (Cache-First with Network Fallback)
   if (url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com') {
     event.respondWith(
       caches.open(FONT_CACHE_NAME).then(async (cache) => {
@@ -94,7 +107,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Navigation Requests (Network-First with App Shell Offline Fallback)
+  // 4. Navigation Requests (Network-First with App Shell Offline Fallback)
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
@@ -118,15 +131,30 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. Static Assets (Scripts, Styles, Images) - Stale-While-Revalidate
-  const isStatic =
+  // 5. JavaScript Scripts: ALWAYS Network-First to prevent stale chunk / version mismatches
+  if (request.destination === 'script') {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+            const copy = networkResponse.clone();
+            caches.open(DYNAMIC_CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // 6. Static Media Assets (Styles, Images, Audio, Icons) - Stale-While-Revalidate
+  const isMediaAsset =
     PRECACHE_ASSETS.includes(url.pathname) ||
-    request.destination === 'script' ||
     request.destination === 'style' ||
     request.destination === 'image' ||
     request.destination === 'font';
 
-  if (isStatic) {
+  if (isMediaAsset) {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
         const fetchPromise = fetch(request)
@@ -145,7 +173,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 5. Default: Network-First with Cache Fallback
+  // 7. Default: Network-First with Cache Fallback
   event.respondWith(
     fetch(request)
       .then((networkResponse) => {
