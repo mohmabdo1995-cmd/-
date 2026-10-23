@@ -1,4 +1,4 @@
-import { Subject, StudyResource } from '../types';
+import { Subject, StudyResource, ArticleItem, VideoItem } from '../types';
 
 export const COLLEGE_INFO = {
   title: "معلومات عن الكلية والمواد الدراسية",
@@ -268,5 +268,112 @@ export const STUDY_RESOURCES: StudyResource[] = [
     link: 'http://t.me/Daleelak_AlJamaei_bot',
     isExternal: true,
     icon: 'FileText'
+  }
+];
+
+export const DEFAULT_ARTICLES: ArticleItem[] = [
+  {
+    id: 'art-study-habits',
+    title: 'دليلك الشامل لتنظيم وقت المذاكرة والتفوق الأكاديمي',
+    subtitle: 'استراتيجيات عملية مجربة لإدارة ساعات الدراسة ومقاومة التشتت اليومي',
+    category: 'إرشادات دراسية',
+    status: 'published',
+    author: 'هيئة الإرشاد الأكاديمي',
+    coverImage: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1000&q=80',
+    createdAt: '2026-03-01T10:00:00.000Z',
+    updatedAt: '2026-03-01T10:00:00.000Z',
+    content: `# دليلك الشامل لتنظيم وقت المذاكرة والتفوق الأكاديمي
+
+النجاح في المرحلة الجامعية لا يعتمد فقط على عدد ساعات الجلوس أمام الكتب، بل على **نوعية وفاعلية إدارة الوقت**.
+
+## 1. تقنية بومودورو الأكاديمية (Pomodoro Technique)
+- قسّم جلسات المذاكرة إلى فترات مركزة مدتها 25 إلى 30 دقيقة.
+- خذ استراحة قصيرة مدتها 5 دقائق لتنشيط الذهن.
+- بعد 4 جلسات متتالية، خذ استراحة أطول تتراوح بين 15 إلى 20 دقيقة.
+
+## 2. جدول المراجعة الأسبوعي (Active Recall)
+لا تكتفِ بإعادة قراءة المذكرات فقط، بل اختبر نفسك باستمرار:
+- حل أسئلة نهاية كل فصل.
+- قم بشرح المفهوم لزميل دراسي أو لنفسك بصوت مسموع.
+- دوّن النقاط الغامضة لطرحها على أستاذ المادة فوراً.
+
+> "التنظيم هو نصف التفوق الأكاديمي، والمذاكرة اليومية المنتظمة تحميك من ضغط ليلة الامتحان."`
+  },
+  {
+    id: 'art-anatomy-mastery',
+    title: 'خارطة طريق إتقان مادة علم التشريح (Human Anatomy)',
+    subtitle: 'كيفية التعامل مع المصطلحات اللاتينية، الأطلس التشريحي، والمشرحة',
+    category: 'العلوم الأساسية',
+    status: 'published',
+    author: 'قسم العلوم الطبية',
+    coverImage: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&w=1000&q=80',
+    createdAt: '2026-03-02T11:00:00.000Z',
+    updatedAt: '2026-03-02T11:00:00.000Z',
+    content: `# خارطة طريق إتقان مادة علم التشريح (Human Anatomy)
+
+يُعتبر علم التشريح حجر الزاوية لكل طالب في التخصصات الطبية والصحية.
+
+## المفاتيح الذهبية للتفوق في التشريح:
+- **الأطلس المصور رفيقك الدائم:** لا تحفظ نصاً تشريحياً دون النظر إلى الصورة ثلاثية الأبعاد المرافقة له.
+- **تفكيك المصطلحات:** أغلب الكلمات التشريحية أصلها لاتيني أو إغريقي، فمعرفة المعنى البادئ واللاحق يسهل الحفظ بنسبة 70%.
+- **الرسم اليدوي المبسط:** قم برسم مخططات بسيطة للشرايين والأوردة ومسارات الأعصاب لترسيخ الذاكرة المكانية.`
+  },
+  {
+    id: 'art-gpa-strategy',
+    title: 'كيف تحسب وتضمن استقرار معدلك التراكمي (GPA)',
+    subtitle: 'تأثير الساعات المعتمدة في السنوات التأسيسية وأهمية كل درجة',
+    category: 'الإرشاد الأكاديمي',
+    status: 'published',
+    author: 'وحدة التوجيه الطلابي',
+    coverImage: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1000&q=80',
+    createdAt: '2026-03-03T12:00:00.000Z',
+    updatedAt: '2026-03-03T12:00:00.000Z',
+    content: `# كيف تحسب وتضمن استقرار معدلك التراكمي (GPA)
+
+المعدل التراكمي هو مقياس أدائك الأكاديمي الإجمالي، ورفعه في الفصول الأولى أسهل بكثير من رفعه لاحقاً.
+
+## نصائح استراتيجية:
+1. ركز جهدك الأكبر على المواد ذات الساعات المعتمدة الأعلى (3 و 4 ساعات).
+2. استغل حاسبة المعدل التراكمي المدمجة في الموقع لمعرفة الدرجات المطلوبة قبل دخول الامتحانات النهائية.
+3. التقييم المستمر والاختبارات الدورية القصيرة (Quizzes) قد تحسم الفارق بين تقدير وآخر.`
+  }
+];
+
+export const DEFAULT_VIDEOS: VideoItem[] = [
+  {
+    id: 'vid-anatomy-intro',
+    title: 'مقدمة شاملة في المصطلحات والمستويات التشريحية (Anatomical Terms)',
+    description: 'شرح مبسط وواضح للأوضاع والمستويات التشريحية القياسية والحركات الميدانية لجسم الإنسان.',
+    videoUrl: 'https://www.youtube.com/watch?v=uBGl2BujkPQ',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&w=800&q=80',
+    duration: '14:20',
+    order: 1,
+    visible: true,
+    fileType: 'video/mp4',
+    createdAt: '2026-03-01T10:00:00.000Z'
+  },
+  {
+    id: 'vid-physiology-membrane',
+    title: 'شرح فيسيولوجيا الخلية وجهد الغشاء والسيال العصبي (Membrane Potential)',
+    description: 'فهم دقيق لانتقال الأيونات عبر الغشاء الخلوي، ومضخة الصوديوم والبوتاسيوم، وجهد الفعل والراحة.',
+    videoUrl: 'https://www.youtube.com/watch?v=fHrc2gVvLz4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80',
+    duration: '18:45',
+    order: 2,
+    visible: true,
+    fileType: 'video/mp4',
+    createdAt: '2026-03-02T11:00:00.000Z'
+  },
+  {
+    id: 'vid-spaced-repetition',
+    title: 'طريقة المذاكرة الفعالة بنظام التكرار المتباعد (Spaced Repetition)',
+    description: 'دليل عملي لتثبيت كميات ضخمة من المعلومات والمصطلحات دون نسيان حتى يوم الاختبار.',
+    videoUrl: 'https://www.youtube.com/watch?v=Z-zNHHpXoMM',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80',
+    duration: '11:30',
+    order: 3,
+    visible: true,
+    fileType: 'video/mp4',
+    createdAt: '2026-03-03T12:00:00.000Z'
   }
 ];

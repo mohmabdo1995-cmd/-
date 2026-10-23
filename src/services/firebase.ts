@@ -17,7 +17,7 @@ import {
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 import { Subject, Lecture, StudyResource, ArticleItem, VideoItem, CollegeInfoData } from '../types';
-import { COLLEGE_INFO, SUBJECTS_DATA } from '../data/academicContent';
+import { COLLEGE_INFO, SUBJECTS_DATA, DEFAULT_ARTICLES, DEFAULT_VIDEOS } from '../data/academicContent';
 
 // Initialize Firebase with long polling fallback for reliable connection
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
@@ -223,10 +223,14 @@ export class FirebaseService {
         articles.push({ id: docSnap.id, ...docSnap.data() } as ArticleItem);
       });
       articles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      callback(articles);
+      if (articles.length === 0) {
+        callback(DEFAULT_ARTICLES);
+      } else {
+        callback(articles);
+      }
     }, (err) => {
-      console.warn('Articles snapshot error:', err);
-      callback([]);
+      console.warn('Articles snapshot error, fallback to defaults:', err);
+      callback(DEFAULT_ARTICLES);
     });
   }
 
@@ -266,10 +270,14 @@ export class FirebaseService {
         videos.push({ id: docSnap.id, ...docSnap.data() } as VideoItem);
       });
       videos.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-      callback(videos);
+      if (videos.length === 0) {
+        callback(DEFAULT_VIDEOS);
+      } else {
+        callback(videos);
+      }
     }, (err) => {
-      console.warn('Videos snapshot error:', err);
-      callback([]);
+      console.warn('Videos snapshot error, fallback to defaults:', err);
+      callback(DEFAULT_VIDEOS);
     });
   }
 
@@ -281,6 +289,38 @@ export class FirebaseService {
     });
     await this.addAdminLog('إضافة فيديو جديد', `عنوان الفيديو: ${item.title}`);
     return docRef.id;
+  }
+
+  static async seedDefaultArticlesAndVideos(): Promise<void> {
+    const colArt = collection(db, 'articles');
+    for (const art of DEFAULT_ARTICLES) {
+      await addDoc(colArt, {
+        title: art.title,
+        subtitle: art.subtitle || '',
+        category: art.category || 'عام',
+        status: art.status,
+        author: art.author || 'هيئة الإرشاد الأكاديمي',
+        coverImage: art.coverImage || '',
+        content: art.content,
+        createdAt: art.createdAt || new Date().toISOString(),
+        updatedAt: art.updatedAt || new Date().toISOString()
+      });
+    }
+    const colVid = collection(db, 'videos');
+    for (const vid of DEFAULT_VIDEOS) {
+      await addDoc(colVid, {
+        title: vid.title,
+        description: vid.description || '',
+        videoUrl: vid.videoUrl,
+        thumbnailUrl: vid.thumbnailUrl || '',
+        duration: vid.duration || '00:00',
+        order: vid.order || 1,
+        visible: vid.visible !== false,
+        fileType: vid.fileType || 'video/mp4',
+        createdAt: vid.createdAt || new Date().toISOString()
+      });
+    }
+    await this.addAdminLog('استيراد البيانات النموذجية', 'تم استيراد المقالات والفيديوهات الأكاديمية بنجاح');
   }
 
   static async updateVideo(id: string, partial: Partial<VideoItem>): Promise<void> {

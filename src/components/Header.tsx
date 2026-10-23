@@ -40,6 +40,50 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
+          {/* Navigation Links (Desktop) */}
+          <nav className="hidden lg:flex items-center gap-1.5 mx-4">
+            <button
+              onClick={() => setActivePage('main')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activePage === 'main' ? 'bg-[#071A3D] text-white dark:bg-[#16958E]' : 'text-[#071A3D] dark:text-slate-200 hover:bg-[#BCEBFF]/30'
+              }`}
+            >
+              الرئيسية
+            </button>
+            <button
+              onClick={() => setActivePage('articles')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activePage === 'articles' ? 'bg-[#071A3D] text-white dark:bg-[#16958E]' : 'text-[#071A3D] dark:text-slate-200 hover:bg-[#BCEBFF]/30'
+              }`}
+            >
+              المقالات
+            </button>
+            <button
+              onClick={() => setActivePage('videos')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activePage === 'videos' ? 'bg-[#071A3D] text-white dark:bg-[#16958E]' : 'text-[#071A3D] dark:text-slate-200 hover:bg-[#BCEBFF]/30'
+              }`}
+            >
+              المكتبة المرئية
+            </button>
+            <button
+              onClick={() => setActivePage('subjects')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activePage === 'subjects' || activePage === 'subject-detail' ? 'bg-[#071A3D] text-white dark:bg-[#16958E]' : 'text-[#071A3D] dark:text-slate-200 hover:bg-[#BCEBFF]/30'
+              }`}
+            >
+              المواد
+            </button>
+            <button
+              onClick={() => setActivePage('schedule')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                activePage === 'schedule' ? 'bg-[#071A3D] text-white dark:bg-[#16958E]' : 'text-[#071A3D] dark:text-slate-200 hover:bg-[#BCEBFF]/30'
+              }`}
+            >
+              الجدول
+            </button>
+          </nav>
+
           {/* Action Buttons: Focus, GPA, Download ZIP, Telegram Bot, Install App */}
           <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-2">
             {/* Top row / Right cluster on mobile & desktop */}
@@ -48,10 +92,10 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('trigger-pwa-install'))}
                 title="تثبيت تطبيق دليلك الجامعي على هاتفك بشعار قبعة التخرج"
-                className="flex items-center justify-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl bg-[#16958E] hover:bg-[#127d77] text-white font-bold text-[11px] sm:text-xs shadow-sm hover:shadow-md transition-all duration-200 active:scale-95 whitespace-nowrap cursor-pointer"
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 min-h-[40px] sm:min-h-[44px] rounded-lg sm:rounded-xl bg-[#16958E] hover:bg-[#127d77] text-white font-bold text-xs sm:text-xs shadow-sm hover:shadow-md transition-all duration-200 active:scale-95 whitespace-nowrap cursor-pointer"
               >
-                <Download className="w-3.5 h-3.5 text-[#BCEBFF]" />
-                <span>تثبيت التطبيق</span>
+                <Download className="w-4 h-4 text-[#BCEBFF]" />
+                <span>تثبيت التطبيق 🎓</span>
               </button>
 
               {/* Telegram Bot Button */}

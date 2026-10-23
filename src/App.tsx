@@ -17,6 +17,8 @@ import { PomodoroTimerModal } from './components/PomodoroTimerModal';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminDashboardLayout } from './components/admin/AdminDashboardLayout';
+import { ArticlesSection } from './components/ArticlesSection';
+import { VideoLibrarySection } from './components/VideoLibrarySection';
 
 export default function App() {
   const [activePage, setActivePage] = useState<ActivePage>('landing');
@@ -80,7 +82,23 @@ export default function App() {
     // Start background notification scheduler
     NotificationService.startScheduler(() => StorageService.getLectures());
 
+    // Dismiss initial HTML splash screen once React has painted its root component
+    const splashTimer = setTimeout(() => {
+      const dismiss = (window as unknown as { __dismissSplash?: () => void }).__dismissSplash;
+      if (typeof dismiss === 'function') {
+        dismiss();
+      } else {
+        const splash = document.getElementById('app-splash');
+        if (splash) {
+          document.body.classList.add('app-mounted');
+          splash.classList.add('splash-fade-out');
+          setTimeout(() => splash.remove(), 480);
+        }
+      }
+    }, 80);
+
     return () => {
+      clearTimeout(splashTimer);
       NotificationService.stopScheduler();
     };
   }, []);
@@ -189,6 +207,18 @@ export default function App() {
           <StudyResourcesSection
             onBack={() => handleNavigate('main')}
             onNavigateToSubject={(subId) => handleNavigate('subjects', subId as SubjectId)}
+          />
+        )}
+
+        {activePage === 'articles' && (
+          <ArticlesSection
+            onBack={() => handleNavigate('main')}
+          />
+        )}
+
+        {activePage === 'videos' && (
+          <VideoLibrarySection
+            onBack={() => handleNavigate('main')}
           />
         )}
       </main>

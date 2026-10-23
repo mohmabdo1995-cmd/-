@@ -184,7 +184,7 @@ export const PwaInstallPrompt: React.FC = () => {
       {!isOpen && (
         <button
           onClick={triggerInstall}
-          className="fixed bottom-20 sm:bottom-6 left-4 z-40 flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#071A3D] text-white hover:bg-[#16958E] border-2 border-[#16958E]/60 shadow-2xl shadow-[#071A3D]/40 transition-all hover:scale-105 active:scale-95 text-xs font-bold font-tajawal group"
+          className="fixed bottom-20 sm:bottom-6 left-4 z-40 flex items-center gap-2.5 px-4 py-2.5 min-h-[44px] rounded-full bg-[#071A3D] text-white hover:bg-[#16958E] border-2 border-[#16958E]/60 shadow-2xl shadow-[#071A3D]/40 transition-all hover:scale-105 active:scale-95 text-xs font-bold font-tajawal group cursor-pointer"
           title="تثبيت التطبيق على هاتفك بشعار قبعة التخرج"
         >
           <span className="relative flex h-3 w-3">
@@ -215,8 +215,9 @@ export const PwaInstallPrompt: React.FC = () => {
             {/* Close button */}
             <button
               onClick={handleDismiss}
-              className="absolute top-4 left-4 p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-[#BCEBFF]/20 transition-colors"
+              className="absolute top-3.5 left-3.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-[#BCEBFF]/20 transition-colors cursor-pointer"
               title="إغلاق"
+              aria-label="إغلاق نافذة التثبيت"
             >
               <X className="w-5 h-5" />
             </button>

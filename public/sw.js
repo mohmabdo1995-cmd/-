@@ -1,10 +1,10 @@
 // Daleelak AlJamaei (دليلك الجامعي) - High-Reliability PWA Service Worker
-const CACHE_VERSION = 'v2.2.0';
+const CACHE_VERSION = 'v2.3.0';
 const STATIC_CACHE_NAME = `daleelak-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE_NAME = `daleelak-dynamic-${CACHE_VERSION}`;
 const FONT_CACHE_NAME = `daleelak-fonts-${CACHE_VERSION}`;
 
-// Core static assets for app shell
+// Core static assets for app shell precaching
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -33,7 +33,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate Event - Clean up stale old caches and take control
+// Activate Event - Clean up stale old caches and claim clients immediately
 self.addEventListener('activate', (event) => {
   const currentCaches = [STATIC_CACHE_NAME, DYNAMIC_CACHE_NAME, FONT_CACHE_NAME];
   event.waitUntil(
@@ -57,17 +57,23 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// Fetch Event - Resilient offline-first & stale-while-revalidate strategy
+// Fetch Event - Network-First with Offline Fallback & Asset Caching
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
-  // Ignore non-GET and browser extensions
-  if (request.method !== 'GET' || !url.protocol.startsWith('http')) {
+  // 1. Ignore non-GET, non-HTTP requests, and Firebase backend API calls
+  if (
+    request.method !== 'GET' ||
+    !url.protocol.startsWith('http') ||
+    url.hostname.includes('firestore.googleapis.com') ||
+    url.hostname.includes('identitytoolkit.googleapis.com') ||
+    url.hostname.includes('securetoken.googleapis.com')
+  ) {
     return;
   }
 
-  // 1. Google Fonts Cache (Cache-First)
+  // 2. Google Fonts & Static CDN Fonts (Cache-First with Network Fallback)
   if (url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com') {
     event.respondWith(
       caches.open(FONT_CACHE_NAME).then(async (cache) => {
@@ -88,7 +94,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Navigation Requests (SPA Route Fallback)
+  // 3. Navigation Requests (Network-First with App Shell Offline Fallback)
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
@@ -100,9 +106,10 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(async () => {
+          // Fall back to cached app shell when offline
           const cached = await caches.match('/index.html') || await caches.match('/');
           if (cached) return cached;
-          return new Response('Offline - Daleelak AlJamaei', {
+          return new Response('Offline - Daleelak AlJamaei (دليلك الجامعي)', {
             status: 200,
             headers: { 'Content-Type': 'text/html; charset=utf-8' }
           });
@@ -111,12 +118,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. Static Assets & Images (Stale-While-Revalidate / Cache-First)
-  const isStatic = PRECACHE_ASSETS.includes(url.pathname) ||
-                   request.destination === 'script' ||
-                   request.destination === 'style' ||
-                   request.destination === 'image' ||
-                   request.destination === 'font';
+  // 4. Static Assets (Scripts, Styles, Images) - Stale-While-Revalidate
+  const isStatic =
+    PRECACHE_ASSETS.includes(url.pathname) ||
+    request.destination === 'script' ||
+    request.destination === 'style' ||
+    request.destination === 'image' ||
+    request.destination === 'font';
 
   if (isStatic) {
     event.respondWith(
@@ -137,7 +145,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. Default: Network first with Cache fallback
+  // 5. Default: Network-First with Cache Fallback
   event.respondWith(
     fetch(request)
       .then((networkResponse) => {

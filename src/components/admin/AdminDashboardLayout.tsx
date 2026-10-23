@@ -217,13 +217,25 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
       return;
     }
 
-    // Convert file to object URL or Base64
-    const url = URL.createObjectURL(file);
-    setEditingVideo(prev => ({ ...prev, videoUrl: url, fileType: file.type || 'video/mp4' }));
+    if (file.size > 850 * 1024) {
+      setVideoFileError(`حجم الملف (${(file.size / (1024 * 1024)).toFixed(1)} ميجابايت) يتجاوز حد التخزين المباشر (1MB). يُوصى بوضع رابط يوتيوب أو Google Drive لتشغيل الفيديوهات الطويلة لجميع الطلاب بلا قيود.`);
+      const url = URL.createObjectURL(file);
+      setEditingVideo(prev => ({ ...prev, videoUrl: url, fileType: file.type || 'video/mp4' }));
+    } else {
+      // Small file: convert to Base64 Data URL so it is permanently saved into Firestore
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setEditingVideo(prev => ({ ...prev, videoUrl: e.target!.result as string, fileType: file.type || 'video/mp4' }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
 
     // Generate Auto Thumbnail Canvas Poster
+    const previewUrl = URL.createObjectURL(file);
     const video = document.createElement('video');
-    video.src = url;
+    video.src = previewUrl;
     video.currentTime = 1;
     video.onloadeddata = () => {
       const canvas = document.createElement('canvas');
@@ -909,17 +921,37 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
                   <p className="text-xs text-slate-500 mt-1">رفع الفيديوهات، التبديل، الترتيب، الصورة المصغرة، والنشر الإلغاء</p>
                 </div>
 
-                <button
-                  onClick={() => {
-                    setEditingVideo({ title: '', description: '', videoUrl: '', visible: true });
-                    setVideoFileError(null);
-                    setIsVideoModalOpen(true);
-                  }}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>رفع/إضافة فيديو</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={async () => {
+                      if (confirm('هل ترغب في استيراد الفيديوهات والمقالات النموذجية إلى قاعدة البيانات؟')) {
+                        try {
+                          await FirebaseService.seedDefaultArticlesAndVideos();
+                          showToast('تم استيراد المحتوى النموذجي بنجاح!');
+                        } catch (e) {
+                          showToast('حدث خطأ أثناء الاستيراد');
+                        }
+                      }
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-300 flex items-center gap-1.5"
+                    title="استيراد فيديوهات ومقالات طبية وأكاديمية نموذجية"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span>استيراد نماذج جاهزة</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setEditingVideo({ title: '', description: '', videoUrl: '', visible: true });
+                      setVideoFileError(null);
+                      setIsVideoModalOpen(true);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>رفع/إضافة فيديو</span>
+                  </button>
+                </div>
               </div>
 
               {videos.length === 0 ? (

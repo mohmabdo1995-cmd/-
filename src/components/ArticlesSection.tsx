@@ -20,8 +20,8 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
 
   useEffect(() => {
     const unsubscribe = FirebaseService.subscribeArticles((data) => {
-      // Filter only published articles for public view
-      setArticles(data.filter(a => a.status === 'published'));
+      // Filter published articles for public view (show unless explicitly marked as draft)
+      setArticles(data.filter(a => a.status !== 'draft'));
     });
     return () => unsubscribe();
   }, []);

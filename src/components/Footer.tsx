@@ -60,6 +60,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </button>
               </li>
               <li>
+                <button onClick={() => onNavigate('articles')} className="hover:text-[#16958E] transition-colors">
+                  المقالات والأبحاث الأكاديمية
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigate('videos')} className="hover:text-[#16958E] transition-colors">
+                  المكتبة المرئية والفيديوهات
+                </button>
+              </li>
+              <li>
                 <button onClick={() => onNavigate('subjects')} className="hover:text-[#16958E] transition-colors">
                   المواد الدراسية ومصادر التعلم
                 </button>

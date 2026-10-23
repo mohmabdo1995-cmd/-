@@ -38,8 +38,161 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+    <!-- Custom Splash Screen Critical Styles -->
+    <style id="splash-critical-css">
+      #app-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        background: radial-gradient(circle at 50% 38%, #0E2F5A 0%, #071A3D 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        font-family: 'Cairo', 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #ffffff;
+        overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+        transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.45s;
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+      }
+      #app-splash.splash-fade-out {
+        opacity: 0;
+        transform: scale(1.04);
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .splash-logo-container {
+        position: relative;
+        width: 104px;
+        height: 104px;
+        margin-bottom: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: splashFloat 2.6s ease-in-out infinite;
+      }
+      .splash-logo-glow {
+        position: absolute;
+        inset: -14px;
+        background: radial-gradient(circle, rgba(22, 149, 142, 0.5) 0%, rgba(7, 26, 61, 0) 70%);
+        border-radius: 50%;
+        animation: splashPulse 2.4s ease-in-out infinite alternate;
+      }
+      .splash-logo-img {
+        position: relative;
+        width: 96px;
+        height: 96px;
+        object-fit: contain;
+        filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+        border-radius: 22px;
+      }
+      .splash-title {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0 0 6px 0;
+        background: linear-gradient(135deg, #FFFFFF 20%, #BCEBFF 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+      }
+      .splash-tagline {
+        font-size: 14px;
+        font-weight: 500;
+        color: #BCEBFF;
+        opacity: 0.88;
+        margin: 0 0 28px 0;
+        text-align: center;
+      }
+      .splash-progress-track {
+        width: 160px;
+        height: 4px;
+        background: rgba(188, 235, 255, 0.16);
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+      }
+      .splash-progress-bar {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 45%;
+        background: linear-gradient(90deg, #16958E, #38BDF8, #BCEBFF);
+        border-radius: 999px;
+        animation: splashProgress 1.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+      }
+      .splash-status {
+        margin-top: 14px;
+        font-size: 12px;
+        color: #94A3B8;
+        letter-spacing: 0.02em;
+        font-weight: 500;
+      }
+      @keyframes splashFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+      }
+      @keyframes splashPulse {
+        0% { opacity: 0.35; transform: scale(0.92); }
+        100% { opacity: 0.9; transform: scale(1.12); }
+      }
+      @keyframes splashProgress {
+        0% { left: -45%; width: 35%; }
+        50% { left: 25%; width: 55%; }
+        100% { left: 100%; width: 35%; }
+      }
+      /* Smooth entry animation for React root */
+      #root {
+        transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+      }
+      body.app-mounted #root {
+        animation: appContentFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes appContentFadeIn {
+        0% { opacity: 0.5; transform: scale(0.995); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+    </style>
   </head>
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-cairo antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-300">
+    <!-- Instant Native Splash Screen Overlay -->
+    <div id="app-splash" aria-label="شاشة التحميل والتجهيز">
+      <div class="splash-logo-container">
+        <div class="splash-logo-glow"></div>
+        <img src="/pwa-192x192.png" alt="دليلك الجامعي" class="splash-logo-img" width="96" height="96" fetchpriority="high" />
+      </div>
+      <h1 class="splash-title">دليلك الجامعي</h1>
+      <p class="splash-tagline">منصتك التعليمية الأكاديمية الشاملة</p>
+      <div class="splash-progress-track">
+        <div class="splash-progress-bar"></div>
+      </div>
+      <span class="splash-status">جاري تشغيل النظام الأكاديمي...</span>
+    </div>
+
+    <!-- Safety fallback dismiss if network delays JS execution -->
+    <script>
+      window.__dismissSplash = function() {
+        var sp = document.getElementById('app-splash');
+        if (sp && !sp.classList.contains('splash-fade-out')) {
+          document.body.classList.add('app-mounted');
+          sp.classList.add('splash-fade-out');
+          setTimeout(function() {
+            if (sp && sp.parentNode) sp.parentNode.removeChild(sp);
+          }, 480);
+        }
+      };
+      // 6s fallback in case of slow or blocked JS
+      setTimeout(function() {
+        window.__dismissSplash();
+      }, 6000);
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -19,8 +19,8 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
 
   useEffect(() => {
     const unsubscribe = FirebaseService.subscribeVideos((data) => {
-      // Filter only visible / published videos for visitors
-      setVideos(data.filter(v => v.visible));
+      // Filter visible videos for visitors (show unless explicitly hidden)
+      setVideos(data.filter(v => v.visible !== false));
     });
     return () => unsubscribe();
   }, []);
@@ -44,39 +44,78 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
     }
   };
 
+  // Helper to extract clean embed URL for YouTube, Google Drive, Vimeo, or iframes
+  const getEmbedUrl = (url: string): string | null => {
+    if (!url) return null;
+    const clean = url.trim();
+
+    // YouTube Shorts: youtube.com/shorts/VIDEO_ID
+    const shortsMatch = clean.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
+    if (shortsMatch && shortsMatch[1]) {
+      return `https://www.youtube.com/embed/${shortsMatch[1]}?autoplay=1`;
+    }
+
+    // YouTube Watch: youtube.com/watch?v=VIDEO_ID or youtu.be/VIDEO_ID
+    const watchMatch = clean.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+    if (watchMatch && watchMatch[1]) {
+      return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1`;
+    }
+
+    // Google Drive: drive.google.com/file/d/FILE_ID/view... -> /preview
+    const gdriveMatch = clean.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (gdriveMatch && gdriveMatch[1]) {
+      return `https://drive.google.com/file/d/${gdriveMatch[1]}/preview`;
+    }
+
+    // Vimeo: vimeo.com/VIDEO_ID
+    const vimeoMatch = clean.match(/vimeo\.com\/([0-9]+)/);
+    if (vimeoMatch && vimeoMatch[1]) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+    }
+
+    if (clean.includes('<iframe') && clean.includes('src=')) {
+      const srcMatch = clean.match(/src=["'](.*?)["']/);
+      if (srcMatch && srcMatch[1]) return srcMatch[1];
+    }
+
+    return null;
+  };
+
   // Helper to render video element or iframe embed
   const renderVideoPlayer = (vid: VideoItem) => {
-    const isEmbed = vid.videoUrl.includes('youtube.com') || vid.videoUrl.includes('youtu.be') || vid.videoUrl.includes('vimeo.com') || vid.videoUrl.includes('iframe');
-    
-    if (isEmbed) {
-      let embedUrl = vid.videoUrl;
-      if (embedUrl.includes('youtube.com/watch?v=')) {
-        embedUrl = embedUrl.replace('watch?v=', 'embed/');
-      } else if (embedUrl.includes('youtu.be/')) {
-        embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
-      }
+    const embedUrl = getEmbedUrl(vid.videoUrl);
+
+    if (embedUrl) {
       return (
         <iframe
           src={embedUrl}
           title={vid.title}
-          className="w-full h-80 sm:h-96 rounded-2xl border border-slate-200"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          className="w-full h-80 sm:h-96 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg bg-black"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
         />
       );
     }
 
     return (
-      <video
-        controls
-        autoPlay
-        src={vid.videoUrl}
-        poster={vid.thumbnailUrl}
-        className="w-full max-h-96 rounded-2xl bg-black border border-slate-200 shadow-lg"
-      >
-        <source src={vid.videoUrl} type={vid.fileType || 'video/mp4'} />
-        متصفحك لا يدعم تشغيل هذا الفيديو مباشرة.
-      </video>
+      <div className="space-y-2">
+        <video
+          controls
+          autoPlay
+          playsInline
+          src={vid.videoUrl}
+          poster={vid.thumbnailUrl}
+          className="w-full max-h-96 rounded-2xl bg-black border border-slate-200 dark:border-slate-800 shadow-lg"
+        >
+          <source src={vid.videoUrl} type={vid.fileType || 'video/mp4'} />
+          متصفحك لا يدعم تشغيل هذا الفيديو مباشرة.
+        </video>
+        {vid.videoUrl.startsWith('blob:') && (
+          <p className="text-[11px] text-amber-500 bg-amber-500/10 p-2 rounded-lg text-center font-medium">
+            تنبيه: هذا الفيديو تم اختياره محلياً من جهاز المشرف. لضمان تشغيله لدى كافة الطلاب بشكل دائم، يُنصح بإدخال رابط يوتيوب أو جوجل درايف عبر لوحة التحكم.
+          </p>
+        )}
+      </div>
     );
   };
 
