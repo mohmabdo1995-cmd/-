@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Download, X, Smartphone, CheckCircle2, Zap, WifiOff, Bell, Share2, PlusSquare, Sparkles, ExternalLink, GraduationCap, ArrowLeft } from 'lucide-react';
+import { Download, X, CheckCircle2, Zap, WifiOff, Bell, Share2, PlusSquare, Sparkles, ExternalLink, GraduationCap, AlertCircle, HelpCircle, ChevronDown, ChevronUp, Smartphone } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -19,9 +19,10 @@ export const PwaInstallPrompt: React.FC = () => {
   const [isIOS, setIsIOS] = useState(false);
   const [isInIframe, setIsInIframe] = useState(false);
   const [showIOSGuide, setShowIOSGuide] = useState(false);
-  const [showManualGuide, setShowManualGuide] = useState(false);
+  const [showTroubleshootGuide, setShowTroubleshootGuide] = useState(false);
   const [installedSuccess, setInstalledSuccess] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
+  const [installAcceptedPending, setInstallAcceptedPending] = useState(false);
 
   useEffect(() => {
     // 1. Detect if app is already running as installed standalone PWA
@@ -68,14 +69,16 @@ export const PwaInstallPrompt: React.FC = () => {
       }
     };
 
+    // Native appinstalled event when Android package manager finishes
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setIsOpen(false);
       setIsInstalling(false);
+      setInstallAcceptedPending(false);
       setInstalledSuccess(true);
       setDeferredPrompt(null);
       window.__deferredPWAInstallPrompt = null;
-      setTimeout(() => setInstalledSuccess(false), 6000);
+      setTimeout(() => setInstalledSuccess(false), 8000);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
@@ -116,7 +119,7 @@ export const PwaInstallPrompt: React.FC = () => {
     sessionStorage.setItem('pwa_prompt_dismissed_session', 'true');
   };
 
-  // Primary install action triggered by clicking any install button
+  // Primary install action triggered by clicking install button
   const triggerInstall = useCallback(async () => {
     const promptEvent = deferredPrompt || window.__deferredPWAInstallPrompt;
 
@@ -127,16 +130,17 @@ export const PwaInstallPrompt: React.FC = () => {
         await promptEvent.prompt();
         const choice = await promptEvent.userChoice;
         if (choice.outcome === 'accepted') {
-          setIsInstalled(true);
-          setIsOpen(false);
-          setInstalledSuccess(true);
-          setTimeout(() => setInstalledSuccess(false), 6000);
+          // Keep dialog open with helpful feedback while Android installs the package
+          setInstallAcceptedPending(true);
+          setShowTroubleshootGuide(false);
+        } else {
+          setIsInstalling(false);
         }
         setDeferredPrompt(null);
         window.__deferredPWAInstallPrompt = null;
       } catch (err) {
         console.warn('Install prompt error:', err);
-        setShowManualGuide(true);
+        setShowTroubleshootGuide(true);
         setIsOpen(true);
       } finally {
         setIsInstalling(false);
@@ -151,17 +155,10 @@ export const PwaInstallPrompt: React.FC = () => {
       return;
     }
 
-    // Case 3: Inside an iframe (AI Studio preview) where iframe security suppresses prompt
-    if (isInIframe) {
-      setIsOpen(true);
-      setShowManualGuide(true);
-      return;
-    }
-
-    // Case 4: Default fallback instructions
-    setShowManualGuide(true);
+    // Case 3: Inside an iframe or prompt not available
     setIsOpen(true);
-  }, [deferredPrompt, isIOS, isInIframe]);
+    setShowTroubleshootGuide(true);
+  }, [deferredPrompt, isIOS]);
 
   // If already running as an installed standalone app, hide the prompt
   if (isInstalled) {
@@ -173,8 +170,8 @@ export const PwaInstallPrompt: React.FC = () => {
       {/* Toast Notification when successfully installed */}
       {installedSuccess && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#071A3D] text-white px-6 py-4 rounded-2xl shadow-2xl border-2 border-[#16958E] flex items-center gap-3 text-sm font-bold font-tajawal animate-bounce max-w-sm text-center">
-          <div className="w-9 h-9 rounded-xl bg-[#16958E] flex items-center justify-center flex-shrink-0">
-            <GraduationCap className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-[#16958E] flex items-center justify-center flex-shrink-0 shadow-lg">
+            <GraduationCap className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="text-[#BCEBFF] text-xs font-bold">تم التثبيت بنجاح! 🎓</div>
@@ -204,12 +201,12 @@ export const PwaInstallPrompt: React.FC = () => {
       {/* Modal Dialog (Educational Platform Style - موقع الديوان) */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#071A3D]/75 backdrop-blur-md animate-fade-in" 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#071A3D]/80 backdrop-blur-md animate-fade-in overflow-y-auto" 
           dir="rtl"
           onClick={handleDismiss}
         >
           <div
-            className="w-full max-w-md bg-white dark:bg-[#071A3D] rounded-3xl p-6 sm:p-7 border border-[#BCEBFF]/80 dark:border-[#16958E]/40 shadow-2xl relative overflow-hidden text-slate-800 dark:text-white transition-all transform animate-scale-in"
+            className="w-full max-w-md bg-white dark:bg-[#071A3D] rounded-3xl p-6 sm:p-7 border border-[#BCEBFF]/80 dark:border-[#16958E]/40 shadow-2xl relative overflow-hidden text-slate-800 dark:text-white transition-all transform animate-scale-in my-auto max-h-[92vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top decorative gradient bar */}
@@ -225,19 +222,14 @@ export const PwaInstallPrompt: React.FC = () => {
             </button>
 
             {/* Header Content with Graduation Cap Logo */}
-            <div className="text-center mt-2 mb-5">
+            <div className="text-center mt-2 mb-4">
               <div className="relative inline-block mb-3">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-[#071A3D] to-[#16958E] text-white flex items-center justify-center mx-auto shadow-xl shadow-[#16958E]/30 border-2 border-[#BCEBFF]/50 p-2">
+                <div className="w-20 h-20 rounded-2xl bg-[#071A3D] text-white flex items-center justify-center mx-auto shadow-xl shadow-[#16958E]/30 border-2 border-[#16958E]/50 p-2">
                   <img
                     src="/pwa-192x192.png"
                     alt="شعار قبعة التخرج"
                     className="w-full h-full object-contain rounded-xl"
-                    onError={(e) => {
-                      // Fallback icon if image fails to render
-                      (e.target as HTMLElement).style.display = 'none';
-                    }}
                   />
-                  <GraduationCap className="w-10 h-10 text-[#BCEBFF] hidden only:block" />
                 </div>
                 <div className="absolute -bottom-1 -right-1 bg-[#16958E] text-white p-1 rounded-full border-2 border-white dark:border-[#071A3D]">
                   <Sparkles className="w-3.5 h-3.5 text-[#BCEBFF]" />
@@ -252,10 +244,31 @@ export const PwaInstallPrompt: React.FC = () => {
               <h3 className="text-xl sm:text-2xl font-extrabold font-tajawal text-[#071A3D] dark:text-white leading-snug">
                 تثبيت تطبيق "دليلك الجامعي"
               </h3>
-              <p className="text-xs text-slate-500 dark:text-[#BCEBFF]/90 mt-1.5 leading-relaxed max-w-sm mx-auto">
+              <p className="text-xs text-slate-500 dark:text-[#BCEBFF]/90 mt-1 leading-relaxed max-w-sm mx-auto">
                 يتحول الموقع مباشرة إلى تطبيق مثبت في هاتفك مع شعار قبعة التخرج في قائمة تطبيقاتك العادية!
               </p>
             </div>
+
+            {/* In-Progress Notification Feedback after user confirms install */}
+            {installAcceptedPending && (
+              <div className="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/40 rounded-2xl p-4 mb-4 text-right animate-fade-in">
+                <div className="flex items-center gap-2.5 text-emerald-800 dark:text-emerald-300 font-bold text-xs mb-1.5">
+                  <span className="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+                  <span>بدأت عملية التثبيت بنجاح في جهازك! 📲</span>
+                </div>
+                <p className="text-slate-600 dark:text-emerald-100/90 text-[11px] leading-relaxed mb-3">
+                  يقوم نظام أندرويد حالياً بإضافة تطبيق دليلك الجامعي بشعار قبعة التخرج إلى قائمة تطبيقاتك.
+                </p>
+                <div className="bg-white/80 dark:bg-[#071A3D]/90 p-2.5 rounded-xl border border-emerald-500/30 text-[11px] text-slate-700 dark:text-slate-200">
+                  <div className="font-bold text-[#16958E] dark:text-[#BCEBFF] mb-1">
+                    ⚡ في حال تعليق إشعار Installing بسبب شبكة الهاتف:
+                  </div>
+                  <p className="leading-normal">
+                    اضغط على قائمة المتصفح <strong>(⋮)</strong> ثم اختر <strong>"إضافة إلى الشاشة الرئيسية" (Add to Home screen)</strong> ليتم التثبيت فوراً وبدون أي انتظار!
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Special alert if testing inside an iframe */}
             {isInIframe && (
@@ -265,7 +278,7 @@ export const PwaInstallPrompt: React.FC = () => {
                   <span>لتثبيت التطبيق على هاتفك مباشرة:</span>
                 </div>
                 <p className="text-slate-600 dark:text-slate-200 text-[11px] leading-relaxed mb-2">
-                  نظراً لتصفحك من داخل نافذة العرض، اضغط على الزر بالأسفل لفتح الرابط مباشرة في متصفح هاتفك (Chrome / Safari) وسيظهر أمر التثبيت التلقائي فوراً!
+                  نظراً لتصفحك من داخل نافذة العرض، اضغط على الزر بالأسفل لفتح الرابط مباشرة في متصفح هاتفك (Chrome) للتثبيت التلقائي فوراً!
                 </p>
                 <a
                   href={window.location.href}
@@ -278,7 +291,7 @@ export const PwaInstallPrompt: React.FC = () => {
               </div>
             )}
 
-            {/* Interactive iOS / Manual Guide View if requested */}
+            {/* iOS Safari Guide View */}
             {showIOSGuide ? (
               <div className="bg-[#BCEBFF]/15 dark:bg-[#0a2558]/50 rounded-2xl p-4 border border-[#16958E]/30 mb-5 space-y-3 text-right animate-fade-in">
                 <div className="flex items-center justify-between text-xs font-bold text-[#16958E] dark:text-[#BCEBFF]">
@@ -298,43 +311,76 @@ export const PwaInstallPrompt: React.FC = () => {
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-[#16958E] text-white flex items-center justify-center text-[11px] font-bold flex-shrink-0 mt-0.5">1</span>
                     <p>
-                      اضغط على زر <strong>المشاركة (Share)</strong> <Share2 className="w-3.5 h-3.5 inline mx-1 text-[#16958E]" /> أسفل شاشة متصفح Safari.
+                      اضغط على زر <strong>المشاركة (Share)</strong> <Share2 className="w-3.5 h-3.5 inline mx-1 text-[#16958E]" /> أسفل متصفح Safari.
                     </p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-[#16958E] text-white flex items-center justify-center text-[11px] font-bold flex-shrink-0 mt-0.5">2</span>
                     <p>
-                      مرر القائمة لأسفل ثم اختر <strong>"إضافة إلى الصفحة الرئيسية"</strong> <PlusSquare className="w-3.5 h-3.5 inline mx-1 text-[#16958E]" /> (Add to Home Screen).
+                      مرر لأسفل ثم اختر <strong>"إضافة إلى الصفحة الرئيسية"</strong> <PlusSquare className="w-3.5 h-3.5 inline mx-1 text-[#16958E]" /> (Add to Home Screen).
                     </p>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="w-5 h-5 rounded-full bg-[#16958E] text-white flex items-center justify-center text-[11px] font-bold flex-shrink-0 mt-0.5">3</span>
                     <p>
-                      اضغط على كلمة <strong>"إضافة (Add)"</strong> وسيظهر التطبيق فوراً بشعار قبعة التخرج بين تطبيقاتك!
+                      اضغط <strong>"إضافة (Add)"</strong> وسيظهر التطبيق فوراً بشعار قبعة التخرج بين تطبيقاتك!
                     </p>
                   </div>
                 </div>
               </div>
-            ) : showManualGuide && !isInIframe ? (
-              <div className="bg-[#BCEBFF]/15 dark:bg-[#0a2558]/50 rounded-2xl p-4 border border-[#16958E]/30 mb-5 space-y-3 text-right animate-fade-in">
+            ) : showTroubleshootGuide ? (
+              /* Android Troubleshoot Guide (Fix "Installing..." hang) */
+              <div className="bg-[#BCEBFF]/15 dark:bg-[#0a2558]/60 rounded-2xl p-4 border border-[#16958E]/40 mb-5 space-y-3 text-right animate-fade-in">
                 <div className="flex items-center justify-between text-xs font-bold text-[#16958E] dark:text-[#BCEBFF]">
-                  <span>طريقة التثبيت التلقائي عبر المتصفح:</span>
+                  <span className="flex items-center gap-1.5">
+                    <HelpCircle className="w-4 h-4 text-amber-400" />
+                    <span>حل مشكلة تعليق إشعار التثبيت (Installing...) في أندرويد:</span>
+                  </span>
                   <button
-                    onClick={() => setShowManualGuide(false)}
+                    onClick={() => setShowTroubleshootGuide(false)}
                     className="text-xs underline text-slate-400 hover:text-white"
                   >
-                    رجوع
+                    إغلاق
                   </button>
                 </div>
-                <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
-                  <p>1. اضغط على زر القائمة <strong>(⋮)</strong> أعلى يسار المتصفح.</p>
-                  <p>2. اختر <strong>"تثبيت التطبيق"</strong> (Install app) أو "إضافة إلى الشاشة الرئيسية".</p>
-                  <p>3. اضغط تثبيت، وسيظهر التطبيق تلقائياً في قائمة تطبيقات هاتفك مع قبعة التخرج.</p>
+
+                <div className="space-y-3 text-xs text-slate-600 dark:text-slate-200">
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-2.5 text-[11px] leading-relaxed">
+                    <strong>سبب التعليق:</strong> يحصل التعليق في بعض الأجهزة عند ضعف شبكة الإنترنت أو تأخر خدمات Google Play في بناء حزمة التطبيق.
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="font-bold text-[#16958E] dark:text-[#BCEBFF] text-xs">
+                      الحل الفوري 100% للتثبيت بدون أي تعليق:
+                    </div>
+                    <div className="flex items-start gap-2 text-[11px]">
+                      <span className="w-5 h-5 rounded-full bg-[#16958E] text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">1</span>
+                      <p>
+                        اضغط على <strong>زر النقاط الثلاث (⋮)</strong> في أعلى يسار متصفح Chrome.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-2 text-[11px]">
+                      <span className="w-5 h-5 rounded-full bg-[#16958E] text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">2</span>
+                      <p>
+                        اختر <strong>"إضافة إلى الشاشة الرئيسية" (Add to Home screen)</strong> أو <strong>"تثبيت التطبيق"</strong>.
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-2 text-[11px]">
+                      <span className="w-5 h-5 rounded-full bg-[#16958E] text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">3</span>
+                      <p>
+                        اضغط <strong>"إضافة" (Add)</strong>، وسيظهر تطبيق <strong>دليلك الجامعي</strong> فوراً مع قبعة التخرج في شاشتك وقائمة التطبيقات!
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-[#16958E]/20 pt-2 text-[11px] text-slate-500 dark:text-slate-400">
+                    💡 <strong>لإزالة الإشعار القديم المعلق:</strong> اسحب إشعار Chrome لليمين أو اليسار لإزالته، أو قم بإغلاق متصفح Chrome وإعادة فتحه.
+                  </div>
                 </div>
               </div>
             ) : (
               /* Features List */
-              <div className="space-y-2.5 mb-6 text-right">
+              <div className="space-y-2.5 mb-5 text-right">
                 <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-[#BCEBFF]/20 dark:bg-[#0a2558]/40 border border-[#BCEBFF]/50 dark:border-[#16958E]/20">
                   <div className="w-8 h-8 rounded-xl bg-[#16958E]/15 text-[#16958E] flex items-center justify-center flex-shrink-0">
                     <GraduationCap className="w-4 h-4" />
@@ -368,7 +414,7 @@ export const PwaInstallPrompt: React.FC = () => {
             )}
 
             {/* Action Buttons */}
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <button
                 onClick={triggerInstall}
                 disabled={isInstalling}
@@ -386,6 +432,17 @@ export const PwaInstallPrompt: React.FC = () => {
                   </>
                 )}
               </button>
+
+              {/* Troubleshooting / Fast Alternative Install Button */}
+              {!showTroubleshootGuide && (
+                <button
+                  onClick={() => setShowTroubleshootGuide(true)}
+                  className="w-full py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <HelpCircle className="w-3.5 h-3.5" />
+                  <span>هل علق الإشعار على Installing؟ اضغط هنا للحل الفوري ⚡</span>
+                </button>
+              )}
 
               <button
                 onClick={handleDismiss}

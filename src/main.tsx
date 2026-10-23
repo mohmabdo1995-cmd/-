@@ -30,20 +30,12 @@ if ('serviceWorker' in navigator) {
       });
   };
 
+  // Check and register service worker on page ready
   if (document.readyState === 'complete') {
     registerSW();
   } else {
     window.addEventListener('load', registerSW);
   }
-
-  // Handle service worker controller change to refresh page seamlessly
-  let refreshing = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!refreshing) {
-      refreshing = true;
-      window.location.reload();
-    }
-  });
 }
 
 createRoot(document.getElementById('root')!).render(
