@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#071A3D" />
+      <stop offset="100%" stop-color="#0E2F5A" />
+    </linearGradient>
+
+    <!-- Teal Glow -->
+    <radialGradient id="tealGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#16958E" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#071A3D" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Graduation Cap Top Diamond Gradient -->
+    <linearGradient id="capGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="60%" stop-color="#F0F9FF" />
+      <stop offset="100%" stop-color="#BCEBFF" />
+    </linearGradient>
+
+    <!-- Gold Accent Gradient for Tassel -->
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE68A" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+
+    <!-- Filter for Shadow -->
+    <filter id="dropShadow" x="-10%" y="-10%" width="125%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- Background Base with Rounded Corners -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGradient)" />
+  <rect width="512" height="512" rx="112" fill="url(#tealGlow)" />
+  <rect width="504" height="504" x="4" y="4" rx="108" fill="none" stroke="#16958E" stroke-opacity="0.3" stroke-width="4" />
+
+  <!-- Academic Graduation Cap Symbol (قبعة التخرج) -->
+  <g filter="url(#dropShadow)" transform="translate(0, -10)">
+    <!-- Skull Cap Base (Headband) -->
+    <path d="M176 270 Q256 340 336 270 L336 295 Q256 370 176 295 Z" fill="#16958E" />
+    <path d="M192 290 Q256 345 320 290 L320 300 Q256 355 192 300 Z" fill="#BCEBFF" opacity="0.8" />
+
+    <!-- Cap Mortarboard Bottom Edge (3D effect) -->
+    <polygon points="256,120 440,195 256,270 72,195" fill="#16958E" transform="translate(0, 10)" />
+
+    <!-- Cap Mortarboard Rhombus Top -->
+    <polygon points="256,120 440,195 256,270 72,195" fill="url(#capGradient)" stroke="#BCEBFF" stroke-width="3" />
+
+    <!-- Central Button -->
+    <ellipse cx="256" cy="195" rx="16" ry="12" fill="url(#goldGradient)" stroke="#FFFFFF" stroke-width="2" />
+
+    <!-- Tassel Ribbon & Fringe -->
+    <path d="M256 195 Q200 205 152 245 Q130 265 125 310" fill="none" stroke="url(#goldGradient)" stroke-width="6" stroke-linecap="round" />
+    <!-- Tassel Ring -->
+    <circle cx="125" cy="312" r="7" fill="url(#goldGradient)" />
+    <!-- Tassel Brush -->
+    <path d="M120 316 L114 365 Q125 372 136 365 L130 316 Z" fill="url(#goldGradient)" />
+  </g>
+
+  <!-- Open Academic Book Pages Underneath -->
+  <g transform="translate(0, 30)">
+    <!-- Left Page -->
+    <path d="M256 390 Q200 375 140 385 Q130 425 256 430 Z" fill="#BCEBFF" opacity="0.9" />
+    <!-- Right Page -->
+    <path d="M256 390 Q312 375 372 385 Q382 425 256 430 Z" fill="#FFFFFF" opacity="0.95" />
+    <!-- Book Spine -->
+    <line x1="256" y1="388" x2="256" y2="430" stroke="#16958E" stroke-width="4" stroke-linecap="round" />
+  </g>
+
+  <!-- Small Academic Sparkles -->
+  <path d="M385 145 Q395 145 395 135 Q395 145 405 145 Q395 145 395 155 Q395 145 385 145 Z" fill="#F59E0B" />
+  <path d="M110 160 Q118 160 118 152 Q118 160 126 160 Q118 160 118 168 Q118 160 110 160 Z" fill="#BCEBFF" />
+</svg>

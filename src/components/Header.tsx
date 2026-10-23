@@ -40,18 +40,31 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons: Focus, GPA, Download ZIP, Telegram Bot */}
-          <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-2.5">
-            {/* Telegram Bot Button - Top row on Mobile, Rightmost on Desktop */}
-            <a
-              href="http://t.me/Daleelak_AlJamaei_bot"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="order-1 sm:order-3 w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-1 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-[11px] sm:text-sm shadow-sm sm:shadow-md shadow-[#071A3D]/20 hover:shadow-lg transition-all duration-200 active:scale-95 whitespace-nowrap text-center"
-            >
-              <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 rotate-180 text-[#BCEBFF]" />
-              <span>بوت التلجرام</span>
-            </a>
+          {/* Action Buttons: Focus, GPA, Download ZIP, Telegram Bot, Install App */}
+          <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-2">
+            {/* Top row / Right cluster on mobile & desktop */}
+            <div className="order-1 sm:order-3 flex items-center gap-1.5 w-full sm:w-auto justify-end">
+              {/* Direct PWA Install Button */}
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('trigger-pwa-install'))}
+                title="تثبيت تطبيق دليلك الجامعي على هاتفك بشعار قبعة التخرج"
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl bg-[#16958E] hover:bg-[#127d77] text-white font-bold text-[11px] sm:text-xs shadow-sm hover:shadow-md transition-all duration-200 active:scale-95 whitespace-nowrap cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-[#BCEBFF]" />
+                <span>تثبيت التطبيق</span>
+              </button>
+
+              {/* Telegram Bot Button */}
+              <a
+                href="http://t.me/Daleelak_AlJamaei_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 px-2.5 py-1 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-[11px] sm:text-xs shadow-sm shadow-[#071A3D]/20 hover:shadow-md transition-all duration-200 active:scale-95 whitespace-nowrap text-center"
+              >
+                <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 rotate-180 text-[#BCEBFF]" />
+                <span>بوت التلجرام</span>
+              </a>
+            </div>
 
             {/* Bottom Row on Mobile: Focus & GPA buttons */}
             <div className="order-2 sm:order-1 flex items-center gap-1 sm:gap-2.5 w-full sm:w-auto">

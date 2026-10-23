@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, Send, Sparkles, BookOpen, Calendar, Zap } from 'lucide-react';
+import { ArrowLeft, Send, Sparkles, BookOpen, Calendar, Zap, Download } from 'lucide-react';
 import { SiteConfig, DEFAULT_SITE_CONFIG } from '../services/firebase';
 
 interface LandingHeroProps {
@@ -81,6 +81,15 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onEnter, siteConfig = 
               <span>{siteConfig.heroPrimaryBtnText || 'دخول'}</span>
               <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1.5 transition-transform duration-300" />
               <div className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            </button>
+
+            {/* Direct PWA Install Button */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('trigger-pwa-install'))}
+              className="inline-flex items-center justify-center gap-2.5 px-8 py-4 text-base font-bold text-white bg-[#16958E] hover:bg-[#127d77] border border-[#16958E]/40 rounded-2xl shadow-lg shadow-[#16958E]/25 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 w-full sm:w-auto cursor-pointer"
+            >
+              <Download className="w-5 h-5 text-[#BCEBFF]" />
+              <span>تثبيت التطبيق على الجوال 📲</span>
             </button>
 
             {/* Direct Telegram Bot Link */}
