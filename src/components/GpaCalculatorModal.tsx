@@ -78,39 +78,39 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="w-full max-w-xl glass-panel rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-xl bg-white dark:bg-[#071A3D] rounded-3xl p-6 sm:p-8 border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-2xl max-h-[90vh] overflow-y-auto"
       >
-        <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-6">
+        <div className="flex items-center justify-between pb-4 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#16958E]/15 text-[#16958E] flex items-center justify-center">
               <Calculator className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-xl font-bold font-tajawal text-slate-900 dark:text-white">حاسبة المعدل التراكمي (GPA)</h3>
+              <h3 className="text-xl font-bold font-tajawal text-[#071A3D] dark:text-white">حاسبة المعدل التراكمي (GPA)</h3>
               <span className="text-xs text-slate-500">حساب الساعات والدرجات التقديرية</span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 flex items-center justify-center"
+            className="w-8 h-8 rounded-full bg-[#BCEBFF]/30 text-[#071A3D] hover:bg-[#BCEBFF]/60 flex items-center justify-center"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* GPA Result Display Box */}
-        <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 text-white mb-6 flex items-center justify-between shadow-lg">
+        <div className="p-6 rounded-2xl bg-gradient-to-r from-[#071A3D] via-[#0a2558] to-[#16958E] text-white mb-6 flex items-center justify-between shadow-lg">
           <div>
-            <span className="text-xs text-emerald-100 font-bold block mb-1">المعدل التراكمي المحسوب</span>
+            <span className="text-xs text-[#BCEBFF] font-bold block mb-1">المعدل التراكمي المحسوب</span>
             <div className="text-4xl font-extrabold font-mono tracking-tight">{gpa} / 4.00</div>
-            <span className="text-xs text-emerald-200 mt-1 block">إجمالي الساعات المعتمدة: {totalCredits} ساعة</span>
+            <span className="text-xs text-[#BCEBFF]/90 mt-1 block">إجمالي الساعات المعتمدة: {totalCredits} ساعة</span>
           </div>
-          <Award className="w-14 h-14 text-emerald-200 opacity-80" />
+          <Award className="w-14 h-14 text-[#BCEBFF] opacity-80" />
         </div>
 
         {/* Add Course Form */}
-        <form onSubmit={handleAddCourse} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 mb-6 space-y-3">
-          <div className="font-bold text-xs text-slate-700 dark:text-slate-300">إضافة مادة جديدة للحساب:</div>
+        <form onSubmit={handleAddCourse} className="p-4 rounded-2xl bg-[#BCEBFF]/10 dark:bg-[#071A3D]/60 border border-[#BCEBFF]/50 dark:border-[#16958E]/30 mb-6 space-y-3">
+          <div className="font-bold text-xs text-[#071A3D] dark:text-slate-300">إضافة مادة جديدة للحساب:</div>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <input
@@ -118,7 +118,7 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
               placeholder="اسم المادة (Anatomy...)"
               value={newCourseName}
               onChange={(e) => setNewCourseName(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 text-[#071A3D] dark:text-white text-xs focus:ring-2 focus:ring-[#16958E] outline-none"
             />
 
             <input
@@ -128,13 +128,13 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
               placeholder="الساعات (3)"
               value={newCourseCredits}
               onChange={(e) => setNewCourseCredits(Number(e.target.value))}
-              className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 text-[#071A3D] dark:text-white text-xs font-mono focus:ring-2 focus:ring-[#16958E] outline-none"
             />
 
             <select
               value={newCourseGrade}
               onChange={(e) => setNewCourseGrade(Number(e.target.value))}
-              className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 text-[#071A3D] dark:text-white text-xs focus:ring-2 focus:ring-[#16958E] outline-none"
             >
               {GRADE_SCALE.map((g) => (
                 <option key={g.letter} value={g.point}>
@@ -146,7 +146,7 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
             <span>إضافة إلى قائمة المواد</span>
@@ -165,13 +165,13 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
           </div>
 
           {courses.map((course) => (
-            <div key={course.id} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between text-xs">
+            <div key={course.id} className="p-3 rounded-xl bg-[#BCEBFF]/15 dark:bg-[#071A3D]/40 border border-[#BCEBFF]/40 dark:border-[#16958E]/20 flex items-center justify-between text-xs">
               <div>
-                <span className="font-bold text-slate-900 dark:text-white block">{course.name}</span>
+                <span className="font-bold text-[#071A3D] dark:text-white block">{course.name}</span>
                 <span className="text-slate-500">{course.credits} ساعات معتمدة</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold font-mono">
+                <span className="px-2.5 py-1 rounded-lg bg-[#16958E]/20 text-[#16958E] font-bold font-mono">
                   {course.gradeLetter} ({course.gradePoint})
                 </span>
                 <button onClick={() => handleDeleteCourse(course.id)} className="text-slate-400 hover:text-rose-600">

@@ -38,13 +38,13 @@ export const CollegeInfoSection: React.FC<CollegeInfoSectionProps> = ({
       <div className="flex items-center justify-between mb-8">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-sm transition-all"
         >
           <ArrowRight className="w-4 h-4" />
           <span>الرجوع للرئيسية</span>
         </button>
 
-        <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">
+        <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#BCEBFF]/40 text-[#071A3D] border border-[#16958E]/30">
           القسم الأول
         </span>
       </div>
@@ -53,16 +53,16 @@ export const CollegeInfoSection: React.FC<CollegeInfoSectionProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl mb-10 shadow-2xl border border-slate-200"
+        className="relative overflow-hidden rounded-3xl mb-10 shadow-2xl border border-[#BCEBFF]/80 dark:border-[#16958E]/30"
       >
         <img
           src={info.image}
           alt={info.title}
           className="w-full h-64 sm:h-96 object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent flex flex-col justify-end p-6 sm:p-10 text-white">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-indigo-600/80 text-white text-xs font-bold w-fit mb-3 backdrop-blur-md">
-            <GraduationCap className="w-4 h-4" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#071A3D] via-[#071A3D]/70 to-transparent flex flex-col justify-end p-6 sm:p-10 text-white">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#071A3D]/80 text-white text-xs font-bold w-fit mb-3 backdrop-blur-md border border-[#16958E]/30">
+            <GraduationCap className="w-4 h-4 text-[#BCEBFF]" />
             <span>جامعتك في جيبك</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold font-tajawal mb-2">{info.title}</h1>
@@ -78,15 +78,15 @@ export const CollegeInfoSection: React.FC<CollegeInfoSectionProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm"
+          className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-sm"
         >
-          <h2 className="text-xl sm:text-2xl font-bold font-tajawal text-slate-900 mb-4 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+          <h2 className="text-xl sm:text-2xl font-bold font-tajawal text-[#071A3D] dark:text-white mb-4 flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-[#BCEBFF]/40 text-[#16958E]">
               <BookOpen className="w-6 h-6" />
             </div>
             نظرة عامة عن الدراسة والكلية
           </h2>
-          <p className="text-slate-700 leading-relaxed text-base sm:text-lg whitespace-pre-wrap">
+          <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-base sm:text-lg whitespace-pre-wrap">
             {info.overview}
           </p>
         </motion.div>
@@ -96,15 +96,15 @@ export const CollegeInfoSection: React.FC<CollegeInfoSectionProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm"
+          className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-sm"
         >
-          <h2 className="text-xl sm:text-2xl font-bold font-tajawal text-slate-900 mb-4 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+          <h2 className="text-xl sm:text-2xl font-bold font-tajawal text-[#071A3D] dark:text-white mb-4 flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-[#BCEBFF]/40 text-[#071A3D] dark:text-[#BCEBFF]">
               <Clock className="w-6 h-6" />
             </div>
             نظام الدراسة والتقييم الأكاديمي
           </h2>
-          <p className="text-slate-700 leading-relaxed text-base sm:text-lg whitespace-pre-wrap">
+          <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-base sm:text-lg whitespace-pre-wrap">
             {info.creditSystem}
           </p>
         </motion.div>
@@ -116,15 +116,15 @@ export const CollegeInfoSection: React.FC<CollegeInfoSectionProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm"
+            className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-sm"
           >
             {sec.image && (
-              <img src={sec.image} alt={sec.title} className="w-full h-56 object-cover rounded-2xl mb-4 border border-slate-200" />
+              <img src={sec.image} alt={sec.title} className="w-full h-56 object-cover rounded-2xl mb-4 border border-[#BCEBFF]/80" />
             )}
-            <h2 className="text-xl sm:text-2xl font-bold font-tajawal text-slate-900 mb-3">
+            <h2 className="text-xl sm:text-2xl font-bold font-tajawal text-[#071A3D] dark:text-white mb-3">
               {sec.title}
             </h2>
-            <p className="text-slate-700 leading-relaxed text-base whitespace-pre-wrap">
+            <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-base whitespace-pre-wrap">
               {sec.content}
             </p>
           </motion.div>
@@ -136,10 +136,10 @@ export const CollegeInfoSection: React.FC<CollegeInfoSectionProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm"
+            className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-sm"
           >
-            <h2 className="text-xl sm:text-2xl font-bold font-tajawal text-slate-900 mb-6 flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600">
+            <h2 className="text-xl sm:text-2xl font-bold font-tajawal text-[#071A3D] dark:text-white mb-6 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-[#BCEBFF]/40 text-[#16958E]">
                 <Lightbulb className="w-6 h-6" />
               </div>
               نصائح توجيهية للطلاب المستجدين
@@ -147,12 +147,12 @@ export const CollegeInfoSection: React.FC<CollegeInfoSectionProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {info.survivalTips.map((tip, idx) => (
-                <div key={tip.id || idx} className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                  <div className="flex items-center gap-2 font-bold text-slate-900 mb-2">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-500 flex-shrink-0" />
+                <div key={tip.id || idx} className="p-5 rounded-2xl bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 border border-[#BCEBFF]/50 dark:border-[#16958E]/30">
+                  <div className="flex items-center gap-2 font-bold text-[#071A3D] dark:text-white mb-2">
+                    <CheckCircle2 className="w-5 h-5 text-[#16958E] flex-shrink-0" />
                     <h4>{tip.title}</h4>
                   </div>
-                  <p className="text-slate-600 text-sm leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
                     {tip.description}
                   </p>
                 </div>
@@ -166,19 +166,19 @@ export const CollegeInfoSection: React.FC<CollegeInfoSectionProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="p-6 rounded-3xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex flex-col sm:flex-row items-center justify-between gap-4"
+          className="p-6 rounded-3xl bg-gradient-to-r from-[#071A3D] via-[#16958E] to-[#071A3D] text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-[#071A3D]/25"
         >
           <div className="flex items-center gap-4">
-            <Award className="w-10 h-10 text-amber-300" />
+            <Award className="w-10 h-10 text-[#BCEBFF]" />
             <div>
               <h3 className="font-bold font-tajawal text-lg">هل أنت جاهز لاستكشاف المقررات الدراسية؟</h3>
-              <p className="text-xs text-indigo-100">استعرض المواد المقررة والأكاديميا بالتفصيل.</p>
+              <p className="text-xs text-[#BCEBFF]">استعرض المواد المقررة والأكاديميا بالتفصيل.</p>
             </div>
           </div>
 
           <button
             onClick={onNavigateToSubjects}
-            className="px-6 py-3 rounded-2xl bg-white text-indigo-700 font-bold text-sm hover:bg-indigo-50 transition-all shadow-md active:scale-95 whitespace-nowrap"
+            className="px-6 py-3 rounded-2xl bg-white text-[#071A3D] font-bold text-sm hover:bg-[#BCEBFF]/30 hover:text-white transition-all shadow-md active:scale-95 whitespace-nowrap"
           >
             الانتقال إلى مصادر والمواد
           </button>

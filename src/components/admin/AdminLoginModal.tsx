@@ -62,16 +62,16 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onSuccess, onC
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden"
+        className="w-full max-w-md bg-white dark:bg-[#071A3D] rounded-3xl p-6 sm:p-8 border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-2xl relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 left-0 h-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
+        <div className="absolute top-0 right-0 left-0 h-2 bg-gradient-to-r from-[#071A3D] via-[#16958E] to-[#BCEBFF]"></div>
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-3 shadow-md border border-blue-200/50 dark:border-blue-800/50">
+          <div className="w-14 h-14 rounded-2xl bg-[#16958E]/15 text-[#16958E] flex items-center justify-center mx-auto mb-3 shadow-md border border-[#16958E]/30">
             <ShieldCheck className="w-7 h-7" />
           </div>
-          <h2 className="text-2xl font-extrabold font-tajawal text-slate-800 dark:text-white">
+          <h2 className="text-2xl font-extrabold font-tajawal text-[#071A3D] dark:text-white">
             تسجيل الدخول للوحة التحكم
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -101,7 +101,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onSuccess, onC
         {/* Form */}
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-bold text-[#071A3D] dark:text-slate-300 mb-1.5">
               كلمة المرور:
             </label>
             <div className="relative">
@@ -111,7 +111,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onSuccess, onC
                 placeholder="أدخل كلمة المرور"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-50"
+                className="w-full pl-10 pr-10 py-3 rounded-2xl bg-[#BCEBFF]/10 dark:bg-[#071A3D]/70 border border-[#BCEBFF]/80 dark:border-[#16958E]/30 text-[#071A3D] dark:text-white text-sm focus:ring-2 focus:ring-[#16958E] outline-none transition-all disabled:opacity-50"
               />
               <KeyRound className="w-5 h-5 text-slate-400 absolute right-3 top-3.5" />
               <button
@@ -129,14 +129,14 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onSuccess, onC
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition-all"
+              className="flex-1 py-3 rounded-2xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-xs transition-all"
             >
               إلغاء
             </button>
             <button
               type="submit"
               disabled={isLockedOut || !password}
-              className="flex-1 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-3 rounded-2xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-lg shadow-[#071A3D]/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <span>دخول اللوحة</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
@@ -144,7 +144,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onSuccess, onC
           </div>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-center text-[11px] text-slate-400">
+        <div className="mt-6 pt-4 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/20 text-center text-[11px] text-slate-400">
           محمية بواسطة Firebase Authentication & Rate Limiting
         </div>
       </motion.div>

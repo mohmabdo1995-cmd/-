@@ -18,11 +18,11 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
 
   const getCategoryIcon = (cat: string) => {
     switch (cat) {
-      case 'telegram': return <Send className="w-5 h-5 text-sky-500 rotate-180" />;
-      case 'book': return <BookOpen className="w-5 h-5 text-indigo-500" />;
-      case 'video': return <Video className="w-5 h-5 text-rose-500" />;
-      case 'notes': return <FileText className="w-5 h-5 text-amber-500" />;
-      default: return <Layers className="w-5 h-5 text-purple-500" />;
+      case 'telegram': return <Send className="w-5 h-5 text-[#16958E] rotate-180" />;
+      case 'book': return <BookOpen className="w-5 h-5 text-[#071A3D] dark:text-[#BCEBFF]" />;
+      case 'video': return <Video className="w-5 h-5 text-[#16958E]" />;
+      case 'notes': return <FileText className="w-5 h-5 text-[#071A3D] dark:text-[#BCEBFF]" />;
+      default: return <Layers className="w-5 h-5 text-[#16958E]" />;
     }
   };
 
@@ -34,18 +34,18 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
         <div>
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all mb-4"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-sm transition-all mb-4"
           >
             <ArrowRight className="w-4 h-4" />
             <span>الرجوع للرئيسية</span>
           </button>
 
-          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-            <Sparkles className="w-4 h-4 text-amber-500" />
+          <div className="flex items-center gap-2 text-[#16958E] dark:text-[#BCEBFF] font-bold text-sm">
+            <Sparkles className="w-4 h-4 text-[#16958E]" />
             <span>القسم الثاني - مصادر الدراسة والكتب</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold font-tajawal text-slate-900 dark:text-white mt-1">
+          <h1 className="text-3xl sm:text-4xl font-extrabold font-tajawal text-[#071A3D] dark:text-white mt-1">
             مصادر الدراسة والمكتبة الرقمية 📖
           </h1>
           <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-1">
@@ -58,9 +58,9 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
           href="http://t.me/Daleelak_AlJamaei_bot"
           target="_blank"
           rel="noopener noreferrer"
-          className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-sm shadow-lg shadow-sky-500/25 flex items-center gap-2 active:scale-95 transition-all"
+          className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#071A3D] to-[#16958E] hover:from-[#0a2558] hover:to-[#1ba8a0] text-white font-bold text-sm shadow-lg shadow-[#071A3D]/25 flex items-center gap-2 active:scale-95 transition-all"
         >
-          <Send className="w-5 h-5 rotate-180" />
+          <Send className="w-5 h-5 rotate-180 text-[#BCEBFF]" />
           <span>فتح بوت التلجرام</span>
         </a>
       </div>
@@ -69,16 +69,16 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-6 sm:p-8 rounded-3xl glass-panel border border-sky-200 dark:border-sky-800/80 mb-10 relative overflow-hidden bg-gradient-to-r from-sky-500/10 via-indigo-500/5 to-transparent"
+        className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 mb-10 relative overflow-hidden shadow-sm"
       >
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-4 text-right">
-            <div className="w-16 h-16 rounded-2xl bg-sky-500 text-white flex items-center justify-center shadow-lg shadow-sky-500/30 flex-shrink-0">
-              <Send className="w-8 h-8 rotate-180" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#071A3D] to-[#16958E] text-white flex items-center justify-center shadow-lg shadow-[#071A3D]/30 flex-shrink-0">
+              <Send className="w-8 h-8 rotate-180 text-[#BCEBFF]" />
             </div>
             <div>
-              <span className="text-xs font-bold text-sky-600 dark:text-sky-400">البوت الأكاديمي الشامل</span>
-              <h2 className="text-2xl font-bold font-tajawal text-slate-900 dark:text-white mt-0.5">
+              <span className="text-xs font-bold text-[#16958E] dark:text-[#BCEBFF]">البوت الأكاديمي الشامل</span>
+              <h2 className="text-2xl font-bold font-tajawal text-[#071A3D] dark:text-white mt-0.5">
                 بوت التلجرام: @Daleelak_AlJamaei_bot
               </h2>
               <p className="text-slate-600 dark:text-slate-400 text-sm mt-1 leading-relaxed max-w-2xl">
@@ -91,22 +91,22 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
             href="http://t.me/Daleelak_AlJamaei_bot"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full md:w-auto px-8 py-4 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-base shadow-lg transition-all text-center whitespace-nowrap active:scale-95 flex items-center justify-center gap-2"
+            className="w-full md:w-auto px-8 py-4 rounded-2xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-base shadow-lg shadow-[#071A3D]/25 transition-all text-center whitespace-nowrap active:scale-95 flex items-center justify-center gap-2"
           >
             <span>انتقال للبوت الآن</span>
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-4 h-4 text-[#BCEBFF]" />
           </a>
         </div>
       </motion.div>
 
       {/* Filter Categories */}
-      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-4 mb-8 overflow-x-auto scrollbar-none">
+      <div className="flex items-center gap-2 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30 pb-4 mb-8 overflow-x-auto scrollbar-none">
         <button
           onClick={() => setFilterCategory('all')}
           className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
             filterCategory === 'all'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+              ? 'bg-[#071A3D] text-white shadow-sm'
+              : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'
           }`}
         >
           جميع المصادر
@@ -116,8 +116,8 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
           onClick={() => setFilterCategory('telegram')}
           className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
             filterCategory === 'telegram'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+              ? 'bg-[#071A3D] text-white shadow-sm'
+              : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'
           }`}
         >
           بوت التلجرام
@@ -127,8 +127,8 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
           onClick={() => setFilterCategory('book')}
           className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
             filterCategory === 'book'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+              ? 'bg-[#071A3D] text-white shadow-sm'
+              : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'
           }`}
         >
           الأطلس والكتب
@@ -138,8 +138,8 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
           onClick={() => setFilterCategory('video')}
           className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
             filterCategory === 'video'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+              ? 'bg-[#071A3D] text-white shadow-sm'
+              : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'
           }`}
         >
           الشروحات والمرئيات
@@ -149,8 +149,8 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
           onClick={() => setFilterCategory('notes')}
           className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
             filterCategory === 'notes'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+              ? 'bg-[#071A3D] text-white shadow-sm'
+              : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'
           }`}
         >
           الملخصات وبنك الأسئلة
@@ -165,19 +165,19 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.08 }}
-            className="p-6 rounded-3xl glass-panel border border-slate-200/80 dark:border-slate-800/80 hover:border-indigo-500/50 transition-all flex flex-col justify-between"
+            className="p-6 rounded-3xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 hover:border-[#16958E] shadow-sm transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50">
+                  <div className="p-3 rounded-2xl bg-[#BCEBFF]/20 dark:bg-[#071A3D]/70 border border-[#BCEBFF]/40 dark:border-[#16958E]/30">
                     {getCategoryIcon(res.category)}
                   </div>
                   <div>
-                    <h3 className="font-bold font-tajawal text-slate-900 dark:text-white text-lg">
+                    <h3 className="font-bold font-tajawal text-[#071A3D] dark:text-white text-lg">
                       {res.title}
                     </h3>
-                    <span className="text-xs text-indigo-600 dark:text-indigo-400 font-mono">
+                    <span className="text-xs text-[#16958E] dark:text-[#BCEBFF] font-mono">
                       {res.subjectId === 'general' ? 'جميع المقررات' : res.subjectId}
                     </span>
                   </div>
@@ -189,21 +189,21 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
               </p>
             </div>
 
-            <div className="pt-4 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
+            <div className="pt-4 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/20 flex items-center justify-between">
               <a
                 href={res.link}
                 target={res.isExternal ? '_blank' : '_self'}
                 rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all active:scale-95"
+                className="px-4 py-2 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs flex items-center gap-2 shadow-md transition-all active:scale-95"
               >
                 <span>الانتقال للمصدر</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <ExternalLink className="w-3.5 h-3.5 text-[#BCEBFF]" />
               </a>
 
               {res.subjectId !== 'general' && (
                 <button
                   onClick={() => onNavigateToSubject(res.subjectId)}
-                  className="text-xs font-bold text-slate-500 hover:text-indigo-600 transition-colors"
+                  className="text-xs font-bold text-slate-500 hover:text-[#16958E] transition-colors"
                 >
                   استعراض المادة →
                 </button>

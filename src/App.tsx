@@ -129,7 +129,7 @@ export default function App() {
   const vis = siteConfig.sectionVisibility || DEFAULT_SITE_CONFIG.sectionVisibility;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 font-cairo" dir="rtl">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#071A3D] text-[#071A3D] dark:text-white transition-colors duration-300 font-cairo" dir="rtl">
       
       {/* Header Bar */}
       <Header

@@ -65,31 +65,31 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
       if (!trimmed) return <div key={idx} className="h-3" />;
 
       if (trimmed.startsWith('### ')) {
-        return <h3 key={idx} className="text-lg font-bold text-slate-800 my-3 font-tajawal">{trimmed.replace('### ', '')}</h3>;
+        return <h3 key={idx} className="text-lg font-bold text-[#071A3D] dark:text-white my-3 font-tajawal">{trimmed.replace('### ', '')}</h3>;
       }
       if (trimmed.startsWith('## ')) {
-        return <h2 key={idx} className="text-xl font-extrabold text-blue-700 my-4 font-tajawal">{trimmed.replace('## ', '')}</h2>;
+        return <h2 key={idx} className="text-xl font-extrabold text-[#16958E] dark:text-[#BCEBFF] my-4 font-tajawal">{trimmed.replace('## ', '')}</h2>;
       }
       if (trimmed.startsWith('# ')) {
-        return <h1 key={idx} className="text-2xl font-black text-slate-900 my-4 font-tajawal">{trimmed.replace('# ', '')}</h1>;
+        return <h1 key={idx} className="text-2xl font-black text-[#071A3D] dark:text-white my-4 font-tajawal">{trimmed.replace('# ', '')}</h1>;
       }
       if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
         return (
-          <li key={idx} className="mr-6 my-1 list-disc text-slate-700 text-sm leading-relaxed">
+          <li key={idx} className="mr-6 my-1 list-disc text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
             {trimmed.substring(2)}
           </li>
         );
       }
       if (/^\d+\.\s/.test(trimmed)) {
         return (
-          <li key={idx} className="mr-6 my-1 list-decimal text-slate-700 text-sm leading-relaxed">
+          <li key={idx} className="mr-6 my-1 list-decimal text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
             {trimmed.replace(/^\d+\.\s/, '')}
           </li>
         );
       }
       if (trimmed.startsWith('> ')) {
         return (
-          <blockquote key={idx} className="border-r-4 border-blue-500 pr-4 my-3 py-2 bg-blue-50/60 rounded-l-xl text-slate-700 italic text-sm">
+          <blockquote key={idx} className="border-r-4 border-[#16958E] pr-4 my-3 py-2 bg-[#BCEBFF]/15 dark:bg-[#071A3D]/50 rounded-l-xl text-[#071A3D] dark:text-slate-200 italic text-sm">
             {trimmed.replace('> ', '')}
           </blockquote>
         );
@@ -100,14 +100,14 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
         if (urlMatch && urlMatch[1]) {
           return (
             <div key={idx} className="my-4">
-              <img src={urlMatch[1]} alt={altMatch ? altMatch[1] : ''} className="w-full max-h-96 object-cover rounded-2xl shadow-md border border-slate-200" />
+              <img src={urlMatch[1]} alt={altMatch ? altMatch[1] : ''} className="w-full max-h-96 object-cover rounded-2xl shadow-md border border-[#BCEBFF]/60" />
             </div>
           );
         }
       }
 
       return (
-        <p key={idx} className="text-slate-700 my-2 leading-relaxed text-sm sm:text-base font-normal">
+        <p key={idx} className="text-slate-700 dark:text-slate-300 my-2 leading-relaxed text-sm sm:text-base font-normal">
           {trimmed}
         </p>
       );
@@ -118,18 +118,18 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 animate-fade-in" dir="rtl">
       
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30">
         <div>
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs mb-3 transition-all"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-xs mb-3 transition-all"
           >
             <ArrowRight className="w-4 h-4" />
             <span>العودة للرئيسية</span>
           </button>
-          <h1 className="text-2xl sm:text-3xl font-black font-tajawal text-slate-900 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <FileText className="w-6 h-6" />
+          <h1 className="text-2xl sm:text-3xl font-black font-tajawal text-[#071A3D] dark:text-white flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#071A3D] to-[#16958E] text-white flex items-center justify-center shadow-lg shadow-[#071A3D]/25">
+              <FileText className="w-6 h-6 text-[#BCEBFF]" />
             </div>
             <span>المقالات والأبحاث الأكاديمية</span>
           </h1>
@@ -145,7 +145,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
             placeholder="بحث في المقالات..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pr-10 pl-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-800 text-xs focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
+            className="w-full pr-10 pl-4 py-2.5 rounded-2xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 text-[#071A3D] dark:text-white text-xs focus:ring-2 focus:ring-[#16958E] outline-none shadow-sm"
           />
           <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-3" />
         </div>
@@ -158,8 +158,8 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
             onClick={() => setSelectedCategory('all')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
               selectedCategory === 'all'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                ? 'bg-[#071A3D] text-white shadow-md'
+                : 'bg-white dark:bg-[#071A3D] text-[#071A3D] dark:text-slate-300 border border-[#BCEBFF]/80 dark:border-[#16958E]/30 hover:bg-[#BCEBFF]/20'
             }`}
           >
             الكل ({articles.length})
@@ -170,8 +170,8 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
               onClick={() => setSelectedCategory(cat)}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 selectedCategory === cat
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                  ? 'bg-[#071A3D] text-white shadow-md'
+                  : 'bg-white dark:bg-[#071A3D] text-[#071A3D] dark:text-slate-300 border border-[#BCEBFF]/80 dark:border-[#16958E]/30 hover:bg-[#BCEBFF]/20'
               }`}
             >
               {cat}
@@ -182,9 +182,9 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
 
       {/* Articles Grid */}
       {filteredArticles.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 p-8">
-          <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-slate-700 font-tajawal">لا توجد مقالات منشورة حالياً</h3>
+        <div className="text-center py-16 bg-white dark:bg-[#071A3D] rounded-3xl border border-[#BCEBFF]/80 dark:border-[#16958E]/30 p-8 shadow-sm">
+          <BookOpen className="w-12 h-12 text-[#16958E]/40 mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-[#071A3D] dark:text-white font-tajawal">لا توجد مقالات منشورة حالياً</h3>
           <p className="text-xs text-slate-400 mt-1">سيقوم فريق الكلية بنشر مقالات وأبحاث جديدة قريباً</p>
         </div>
       ) : (
@@ -194,7 +194,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
               key={art.id}
               whileHover={{ y: -4 }}
               onClick={() => setActiveArticle(art)}
-              className="bg-white rounded-3xl border border-slate-200/90 shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden flex flex-col group relative"
+              className="bg-white dark:bg-[#071A3D] rounded-3xl border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-sm hover:border-[#16958E] transition-all cursor-pointer overflow-hidden flex flex-col group relative"
             >
               {art.coverImage ? (
                 <div className="h-48 w-full overflow-hidden relative">
@@ -204,16 +204,16 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   {art.category && (
-                    <span className="absolute top-3 right-3 px-3 py-1 rounded-full bg-blue-600/90 text-white text-[11px] font-bold backdrop-blur-md shadow">
+                    <span className="absolute top-3 right-3 px-3 py-1 rounded-full bg-[#071A3D]/90 text-white text-[11px] font-bold backdrop-blur-md shadow">
                       {art.category}
                     </span>
                   )}
                 </div>
               ) : (
-                <div className="h-32 w-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white relative">
-                  <FileText className="w-12 h-12 opacity-40" />
+                <div className="h-32 w-full bg-gradient-to-br from-[#071A3D] to-[#16958E] flex items-center justify-center text-white relative">
+                  <FileText className="w-12 h-12 text-[#BCEBFF] opacity-60" />
                   {art.category && (
-                    <span className="absolute top-3 right-3 px-3 py-1 rounded-full bg-white/20 text-white text-[11px] font-bold backdrop-blur-md">
+                    <span className="absolute top-3 right-3 px-3 py-1 rounded-full bg-[#071A3D]/70 text-[#BCEBFF] text-[11px] font-bold backdrop-blur-md">
                       {art.category}
                     </span>
                   )}
@@ -224,18 +224,18 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
                 <div>
                   <div className="flex items-center gap-3 text-[11px] text-slate-400 mb-2">
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                      <Calendar className="w-3.5 h-3.5 text-[#16958E]" />
                       {new Date(art.createdAt).toLocaleDateString('ar-EG')}
                     </span>
                     {art.author && (
                       <span className="flex items-center gap-1">
-                        <User className="w-3.5 h-3.5 text-blue-500" />
+                        <User className="w-3.5 h-3.5 text-[#16958E]" />
                         {art.author}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="text-base font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors font-tajawal line-clamp-2">
+                  <h3 className="text-base font-extrabold text-[#071A3D] dark:text-white group-hover:text-[#16958E] transition-colors font-tajawal line-clamp-2">
                     {art.title}
                   </h3>
 
@@ -246,9 +246,9 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600">
+                <div className="pt-3 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/20 flex items-center justify-between text-xs font-bold text-[#16958E]">
                   <span>قراءة المقال كاملاً</span>
-                  <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform text-[#16958E]" />
                 </div>
               </div>
             </motion.div>
@@ -264,12 +264,12 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-3xl max-h-[90vh] bg-white rounded-3xl border border-slate-200 shadow-2xl flex flex-col overflow-hidden relative"
+              className="w-full max-w-3xl max-h-[90vh] bg-white dark:bg-[#071A3D] rounded-3xl border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-2xl flex flex-col overflow-hidden relative"
             >
               {/* Modal Top Header */}
-              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <div className="px-6 py-4 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30 flex items-center justify-between bg-[#BCEBFF]/10 dark:bg-[#071A3D]/70">
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
+                  <span className="px-2.5 py-1 rounded-full bg-[#BCEBFF]/40 text-[#071A3D] border border-[#16958E]/30 text-xs font-bold">
                     {activeArticle.category || 'مقال أكاديمي'}
                   </span>
                   <span className="text-xs text-slate-400 font-mono">
@@ -280,16 +280,16 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleShare(activeArticle)}
-                    className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all text-xs font-bold flex items-center gap-1.5"
+                    className="p-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] transition-all text-xs font-bold flex items-center gap-1.5"
                     title="مشاركة المقال"
                   >
-                    {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
+                    {copiedLink ? <Check className="w-4 h-4 text-[#16958E]" /> : <Share2 className="w-4 h-4" />}
                     <span className="hidden sm:inline">{copiedLink ? 'تم النسخ!' : 'مشاركة'}</span>
                   </button>
 
                   <button
                     onClick={() => setActiveArticle(null)}
-                    className="p-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 transition-all"
+                    className="p-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] transition-all"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -302,12 +302,12 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
                   <img
                     src={activeArticle.coverImage}
                     alt={activeArticle.title}
-                    className="w-full max-h-80 object-cover rounded-2xl shadow border border-slate-200"
+                    className="w-full max-h-80 object-cover rounded-2xl shadow border border-[#BCEBFF]/60"
                   />
                 )}
 
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black font-tajawal text-slate-900 leading-snug">
+                  <h1 className="text-2xl sm:text-3xl font-black font-tajawal text-[#071A3D] dark:text-white leading-snug">
                     {activeArticle.title}
                   </h1>
                   {activeArticle.subtitle && (
@@ -317,23 +317,23 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
                   )}
 
                   {activeArticle.author && (
-                    <div className="mt-3 flex items-center gap-2 text-xs font-bold text-blue-600">
+                    <div className="mt-3 flex items-center gap-2 text-xs font-bold text-[#16958E]">
                       <User className="w-4 h-4" />
                       <span>بقلم: {activeArticle.author}</span>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 font-cairo">
+                <div className="pt-4 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/20 font-cairo">
                   {renderFormattedText(activeArticle.content)}
                 </div>
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
+              <div className="p-4 bg-[#BCEBFF]/10 dark:bg-[#071A3D]/70 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/30 text-center">
                 <button
                   onClick={() => setActiveArticle(null)}
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all"
+                  className="px-6 py-2.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-md transition-all"
                 >
                   إغلاق المقال
                 </button>

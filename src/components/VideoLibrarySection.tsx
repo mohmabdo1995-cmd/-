@@ -84,18 +84,18 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
     <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 animate-fade-in" dir="rtl">
       
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30">
         <div>
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs mb-3 transition-all"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-xs mb-3 transition-all"
           >
             <ArrowRight className="w-4 h-4" />
             <span>العودة للرئيسية</span>
           </button>
-          <h1 className="text-2xl sm:text-3xl font-black font-tajawal text-slate-900 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <Video className="w-6 h-6" />
+          <h1 className="text-2xl sm:text-3xl font-black font-tajawal text-[#071A3D] dark:text-white flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#071A3D] to-[#16958E] text-white flex items-center justify-center shadow-lg shadow-[#071A3D]/25">
+              <Video className="w-6 h-6 text-[#BCEBFF]" />
             </div>
             <span>المكتبة المرئية والفيديوهات الأكاديمية</span>
           </h1>
@@ -111,7 +111,7 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
             placeholder="بحث في الفيديوهات..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pr-10 pl-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-800 text-xs focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm"
+            className="w-full pr-10 pl-4 py-2.5 rounded-2xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 text-[#071A3D] dark:text-white text-xs focus:ring-2 focus:ring-[#16958E] outline-none shadow-sm"
           />
           <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-3" />
         </div>
@@ -119,9 +119,9 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
 
       {/* Videos Grid */}
       {filteredVideos.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 p-8">
-          <Film className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-slate-700 font-tajawal">لا توجد فيديوهات منشورة حالياً</h3>
+        <div className="text-center py-16 bg-white dark:bg-[#071A3D] rounded-3xl border border-[#BCEBFF]/80 dark:border-[#16958E]/30 p-8 shadow-sm">
+          <Film className="w-12 h-12 text-[#16958E]/40 mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-[#071A3D] dark:text-white font-tajawal">لا توجد فيديوهات منشورة حالياً</h3>
           <p className="text-xs text-slate-400 mt-1">سيتم رفع وتحديث الفيديوهات والشروحات قريباً</p>
         </div>
       ) : (
@@ -131,9 +131,9 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
               key={vid.id}
               whileHover={{ y: -4 }}
               onClick={() => setActiveVideo(vid)}
-              className="bg-white rounded-3xl border border-slate-200 shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden flex flex-col group relative"
+              className="bg-white dark:bg-[#071A3D] rounded-3xl border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-sm hover:border-[#16958E] transition-all cursor-pointer overflow-hidden flex flex-col group relative"
             >
-              <div className="h-48 w-full bg-slate-900 relative overflow-hidden flex items-center justify-center">
+              <div className="h-48 w-full bg-[#071A3D] relative overflow-hidden flex items-center justify-center">
                 {vid.thumbnailUrl ? (
                   <img
                     src={vid.thumbnailUrl}
@@ -141,21 +141,21 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-indigo-900 to-slate-900 flex items-center justify-center">
-                    <Film className="w-12 h-12 text-indigo-400/40" />
+                  <div className="w-full h-full bg-gradient-to-br from-[#071A3D] to-[#16958E] flex items-center justify-center">
+                    <Film className="w-12 h-12 text-[#BCEBFF]/40" />
                   </div>
                 )}
 
                 {/* Play Button Overlay */}
-                <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/40 transition-colors flex items-center justify-center">
-                  <div className="w-14 h-14 rounded-full bg-white/90 text-indigo-600 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                    <Play className="w-6 h-6 fill-indigo-600 mr-1" />
+                <div className="absolute inset-0 bg-[#071A3D]/40 group-hover:bg-[#071A3D]/50 transition-colors flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-white/95 text-[#16958E] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                    <Play className="w-6 h-6 fill-[#16958E] mr-1" />
                   </div>
                 </div>
 
                 {vid.duration && (
-                  <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/80 text-white text-[11px] font-mono flex items-center gap-1 backdrop-blur-md">
-                    <Clock className="w-3 h-3 text-amber-400" />
+                  <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-[#071A3D]/85 text-white text-[11px] font-mono flex items-center gap-1 backdrop-blur-md">
+                    <Clock className="w-3 h-3 text-[#BCEBFF]" />
                     {vid.duration}
                   </span>
                 )}
@@ -163,7 +163,7 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
 
               <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors font-tajawal line-clamp-2">
+                  <h3 className="text-base font-extrabold text-[#071A3D] dark:text-white group-hover:text-[#16958E] transition-colors font-tajawal line-clamp-2">
                     {vid.title}
                   </h3>
                   {vid.description && (
@@ -173,9 +173,9 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-indigo-600">
+                <div className="pt-3 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/20 flex items-center justify-between text-xs font-bold text-[#16958E]">
                   <span>مشاهدة الفيديو</span>
-                  <Play className="w-4 h-4 fill-indigo-600" />
+                  <Play className="w-4 h-4 fill-[#16958E]" />
                 </div>
               </div>
             </motion.div>
@@ -191,27 +191,27 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-4xl max-h-[92vh] bg-white rounded-3xl border border-slate-200 shadow-2xl flex flex-col overflow-hidden relative"
+              className="w-full max-w-4xl max-h-[92vh] bg-white dark:bg-[#071A3D] rounded-3xl border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-2xl flex flex-col overflow-hidden relative"
             >
               {/* Modal Top Header */}
-              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <h3 className="text-sm font-extrabold text-slate-800 font-tajawal truncate max-w-lg">
+              <div className="px-6 py-4 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30 flex items-center justify-between bg-[#BCEBFF]/10 dark:bg-[#071A3D]/70">
+                <h3 className="text-sm font-extrabold text-[#071A3D] dark:text-white font-tajawal truncate max-w-lg">
                   {activeVideo.title}
                 </h3>
 
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleShare(activeVideo)}
-                    className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-all text-xs font-bold flex items-center gap-1.5"
+                    className="p-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] transition-all text-xs font-bold flex items-center gap-1.5"
                     title="مشاركة الفيديو"
                   >
-                    {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
+                    {copiedLink ? <Check className="w-4 h-4 text-[#16958E]" /> : <Share2 className="w-4 h-4" />}
                     <span className="hidden sm:inline">{copiedLink ? 'تم النسخ!' : 'مشاركة'}</span>
                   </button>
 
                   <button
                     onClick={() => setActiveVideo(null)}
-                    className="p-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 transition-all"
+                    className="p-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] transition-all"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -223,11 +223,11 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
                 {renderVideoPlayer(activeVideo)}
 
                 <div>
-                  <h2 className="text-xl font-extrabold font-tajawal text-slate-900">
+                  <h2 className="text-xl font-extrabold font-tajawal text-[#071A3D] dark:text-white">
                     {activeVideo.title}
                   </h2>
                   {activeVideo.description && (
-                    <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed whitespace-pre-wrap bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 mt-2 leading-relaxed whitespace-pre-wrap bg-[#BCEBFF]/10 dark:bg-[#071A3D]/50 p-4 rounded-2xl border border-[#BCEBFF]/30">
                       {activeVideo.description}
                     </p>
                   )}
@@ -235,10 +235,10 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
+              <div className="p-4 bg-[#BCEBFF]/10 dark:bg-[#071A3D]/70 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/30 text-center">
                 <button
                   onClick={() => setActiveVideo(null)}
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all"
+                  className="px-6 py-2.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-md transition-all"
                 >
                   إغلاق الفيديو
                 </button>
