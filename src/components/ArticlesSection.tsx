@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { ArticleItem } from '../types';
 import { FirebaseService } from '../services/firebase';
+import { Modal } from './common/Modal';
 
 interface ArticlesSectionProps {
   onBack: () => void;
@@ -122,7 +123,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
         <div>
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-xs mb-3 transition-all"
+            className="inline-flex items-center gap-2 h-9 px-3.5 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] dark:text-[#BCEBFF] font-bold text-xs mb-3 transition-all"
           >
             <ArrowRight className="w-4 h-4" />
             <span>العودة للرئيسية</span>
@@ -156,7 +157,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            className={`h-9 px-4 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center ${
               selectedCategory === 'all'
                 ? 'bg-[#071A3D] text-white shadow-md'
                 : 'bg-white dark:bg-[#071A3D] text-[#071A3D] dark:text-slate-300 border border-[#BCEBFF]/80 dark:border-[#16958E]/30 hover:bg-[#BCEBFF]/20'
@@ -168,7 +169,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`h-9 px-4 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center ${
                 selectedCategory === cat
                   ? 'bg-[#071A3D] text-white shadow-md'
                   : 'bg-white dark:bg-[#071A3D] text-[#071A3D] dark:text-slate-300 border border-[#BCEBFF]/80 dark:border-[#16958E]/30 hover:bg-[#BCEBFF]/20'
@@ -257,91 +258,67 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({ onBack }) => {
       )}
 
       {/* Article Detail View Modal */}
-      <AnimatePresence>
-        {activeArticle && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in" dir="rtl">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-3xl max-h-[90vh] bg-white dark:bg-[#071A3D] rounded-3xl border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-2xl flex flex-col overflow-hidden relative"
+      {activeArticle && (
+        <Modal
+          isOpen={Boolean(activeArticle)}
+          onClose={() => setActiveArticle(null)}
+          maxWidth="3xl"
+          title={activeArticle.title}
+          subtitle={`${activeArticle.category || 'مقال أكاديمي'} • ${new Date(activeArticle.createdAt).toLocaleDateString('ar-EG')}`}
+          icon={<BookOpen className="w-5 h-5 text-[#16958E]" />}
+          headerActions={
+            <button
+              onClick={() => handleShare(activeArticle)}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-[#071A3D] dark:text-white transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              title="مشاركة المقال"
             >
-              {/* Modal Top Header */}
-              <div className="px-6 py-4 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30 flex items-center justify-between bg-[#BCEBFF]/10 dark:bg-[#071A3D]/70">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-full bg-[#BCEBFF]/40 text-[#071A3D] border border-[#16958E]/30 text-xs font-bold">
-                    {activeArticle.category || 'مقال أكاديمي'}
-                  </span>
-                  <span className="text-xs text-slate-400 font-mono">
-                    {new Date(activeArticle.createdAt).toLocaleDateString('ar-EG')}
-                  </span>
+              {copiedLink ? <Check className="w-4 h-4 text-[#16958E]" /> : <Share2 className="w-4 h-4" />}
+              <span className="hidden sm:inline">{copiedLink ? 'تم النسخ!' : 'مشاركة'}</span>
+            </button>
+          }
+          footer={
+            <button
+              onClick={() => setActiveArticle(null)}
+              className="px-6 py-2.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+            >
+              إغلاق المقال
+            </button>
+          }
+        >
+          <div className="space-y-6">
+            {activeArticle.coverImage && (
+              <img
+                src={activeArticle.coverImage}
+                alt={activeArticle.title}
+                className="w-full max-h-80 object-cover rounded-2xl shadow border border-slate-200 dark:border-white/10"
+              />
+            )}
+
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-black font-tajawal text-[#071A3D] dark:text-white leading-snug">
+                {activeArticle.title}
+              </h1>
+              {activeArticle.subtitle && (
+                <p className="text-sm sm:text-base text-slate-500 mt-2 font-medium">
+                  {activeArticle.subtitle}
+                </p>
+              )}
+
+              {activeArticle.author && (
+                <div className="mt-3 flex items-center gap-2 text-xs font-bold text-[#16958E]">
+                  <User className="w-4 h-4" />
+                  <span>بقلم: {activeArticle.author}</span>
                 </div>
+              )}
+            </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleShare(activeArticle)}
-                    className="p-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] transition-all text-xs font-bold flex items-center gap-1.5"
-                    title="مشاركة المقال"
-                  >
-                    {copiedLink ? <Check className="w-4 h-4 text-[#16958E]" /> : <Share2 className="w-4 h-4" />}
-                    <span className="hidden sm:inline">{copiedLink ? 'تم النسخ!' : 'مشاركة'}</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveArticle(null)}
-                    className="p-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] transition-all"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Modal Scrollable Body */}
-              <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
-                {activeArticle.coverImage && (
-                  <img
-                    src={activeArticle.coverImage}
-                    alt={activeArticle.title}
-                    className="w-full max-h-80 object-cover rounded-2xl shadow border border-[#BCEBFF]/60"
-                  />
-                )}
-
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-black font-tajawal text-[#071A3D] dark:text-white leading-snug">
-                    {activeArticle.title}
-                  </h1>
-                  {activeArticle.subtitle && (
-                    <p className="text-sm sm:text-base text-slate-500 mt-2 font-medium">
-                      {activeArticle.subtitle}
-                    </p>
-                  )}
-
-                  {activeArticle.author && (
-                    <div className="mt-3 flex items-center gap-2 text-xs font-bold text-[#16958E]">
-                      <User className="w-4 h-4" />
-                      <span>بقلم: {activeArticle.author}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-4 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/20 font-cairo">
-                  {renderFormattedText(activeArticle.content)}
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="p-4 bg-[#BCEBFF]/10 dark:bg-[#071A3D]/70 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/30 text-center">
-                <button
-                  onClick={() => setActiveArticle(null)}
-                  className="px-6 py-2.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-md transition-all"
-                >
-                  إغلاق المقال
-                </button>
-              </div>
-            </motion.div>
+            <div className="pt-4 border-t border-slate-100 dark:border-white/10 font-cairo">
+              {renderFormattedText(activeArticle.content)}
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </Modal>
+      )}
+
 
     </div>
   );

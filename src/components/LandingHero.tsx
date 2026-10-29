@@ -72,21 +72,21 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onEnter, siteConfig = 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-14"
+            className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full justify-center mb-14"
           >
             <button
               onClick={onEnter}
-              className="group relative inline-flex items-center justify-center gap-3 px-10 py-4 text-lg font-bold text-white bg-gradient-to-r from-[#071A3D] via-[#16958E] to-[#071A3D] rounded-2xl shadow-xl shadow-[#071A3D]/25 hover:shadow-2xl hover:shadow-[#16958E]/40 hover:scale-105 active:scale-95 transition-all duration-300 w-full sm:w-auto"
+              className="group relative inline-flex items-center justify-center gap-2.5 h-13 sm:h-14 px-7 sm:px-8 rounded-2xl text-sm sm:text-base font-bold text-white bg-gradient-to-r from-[#071A3D] via-[#16958E] to-[#071A3D] shadow-xl shadow-[#071A3D]/25 hover:shadow-2xl hover:shadow-[#16958E]/40 hover:scale-105 active:scale-95 transition-all duration-300 w-full sm:w-auto cursor-pointer"
             >
-              <span>{siteConfig.heroPrimaryBtnText || 'دخول'}</span>
-              <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1.5 transition-transform duration-300" />
+              <span>{siteConfig.heroPrimaryBtnText || 'دخول اللوحة الرئيسية'}</span>
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1.5 transition-transform duration-300" />
               <div className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             </button>
 
             {/* Direct PWA Install Button */}
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('trigger-pwa-install'))}
-              className="inline-flex items-center justify-center gap-2.5 px-8 py-4 text-base font-bold text-white bg-[#16958E] hover:bg-[#127d77] border border-[#16958E]/40 rounded-2xl shadow-lg shadow-[#16958E]/25 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 w-full sm:w-auto cursor-pointer"
+              className="inline-flex items-center justify-center gap-2.5 h-13 sm:h-14 px-7 sm:px-8 rounded-2xl text-sm sm:text-base font-bold text-white bg-[#16958E] hover:bg-[#127d77] border border-[#16958E]/40 shadow-lg shadow-[#16958E]/25 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 w-full sm:w-auto cursor-pointer"
             >
               <Download className="w-5 h-5 text-[#BCEBFF]" />
               <span>تثبيت التطبيق على الجوال 📲</span>
@@ -98,7 +98,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onEnter, siteConfig = 
                 href={siteConfig.telegramBotLink || "http://t.me/Daleelak_AlJamaei_bot"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-4 text-base font-bold text-[#071A3D] dark:text-[#BCEBFF] bg-[#BCEBFF]/40 dark:bg-[#071A3D]/60 border border-[#16958E]/30 rounded-2xl hover:bg-[#BCEBFF]/70 dark:hover:bg-[#16958E]/30 transition-all duration-200 w-full sm:w-auto"
+                className="inline-flex items-center justify-center gap-2.5 h-13 sm:h-14 px-7 sm:px-8 rounded-2xl text-sm sm:text-base font-bold text-[#071A3D] dark:text-[#BCEBFF] bg-[#BCEBFF]/40 dark:bg-[#071A3D]/60 border border-[#16958E]/30 hover:bg-[#BCEBFF]/70 dark:hover:bg-[#16958E]/30 transition-all duration-200 w-full sm:w-auto text-center"
               >
                 <Send className="w-5 h-5 rotate-180 text-[#16958E]" />
                 <span>{siteConfig.telegramBotName || 'بوت التلجرام'}</span>

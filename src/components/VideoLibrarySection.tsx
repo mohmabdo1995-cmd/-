@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { VideoItem } from '../types';
 import { FirebaseService } from '../services/firebase';
+import { Modal } from './common/Modal';
 
 interface VideoLibrarySectionProps {
   onBack: () => void;
@@ -127,7 +128,7 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
         <div>
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-xs mb-3 transition-all"
+            className="inline-flex items-center gap-2 h-9 px-3.5 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] dark:text-[#BCEBFF] font-bold text-xs mb-3 transition-all"
           >
             <ArrowRight className="w-4 h-4" />
             <span>العودة للرئيسية</span>
@@ -223,69 +224,50 @@ export const VideoLibrarySection: React.FC<VideoLibrarySectionProps> = ({ onBack
       )}
 
       {/* Video Modal Player */}
-      <AnimatePresence>
-        {activeVideo && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in" dir="rtl">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-4xl max-h-[92vh] bg-white dark:bg-[#071A3D] rounded-3xl border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-2xl flex flex-col overflow-hidden relative"
+      {activeVideo && (
+        <Modal
+          isOpen={Boolean(activeVideo)}
+          onClose={() => setActiveVideo(null)}
+          maxWidth="4xl"
+          title={activeVideo.title}
+          subtitle={activeVideo.subject ? `المادة: ${activeVideo.subject}` : 'شرح مرئي مسجل'}
+          icon={<Film className="w-5 h-5 text-[#16958E]" />}
+          headerActions={
+            <button
+              onClick={() => handleShare(activeVideo)}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-[#071A3D] dark:text-white transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              title="مشاركة الفيديو"
             >
-              {/* Modal Top Header */}
-              <div className="px-6 py-4 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30 flex items-center justify-between bg-[#BCEBFF]/10 dark:bg-[#071A3D]/70">
-                <h3 className="text-sm font-extrabold text-[#071A3D] dark:text-white font-tajawal truncate max-w-lg">
-                  {activeVideo.title}
-                </h3>
+              {copiedLink ? <Check className="w-4 h-4 text-[#16958E]" /> : <Share2 className="w-4 h-4" />}
+              <span className="hidden sm:inline">{copiedLink ? 'تم النسخ!' : 'مشاركة'}</span>
+            </button>
+          }
+          footer={
+            <button
+              onClick={() => setActiveVideo(null)}
+              className="px-6 py-2.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+            >
+              إغلاق الفيديو
+            </button>
+          }
+        >
+          <div className="space-y-4">
+            {renderVideoPlayer(activeVideo)}
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleShare(activeVideo)}
-                    className="p-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] transition-all text-xs font-bold flex items-center gap-1.5"
-                    title="مشاركة الفيديو"
-                  >
-                    {copiedLink ? <Check className="w-4 h-4 text-[#16958E]" /> : <Share2 className="w-4 h-4" />}
-                    <span className="hidden sm:inline">{copiedLink ? 'تم النسخ!' : 'مشاركة'}</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveVideo(null)}
-                    className="p-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] transition-all"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Player Body */}
-              <div className="p-4 sm:p-6 overflow-y-auto space-y-4">
-                {renderVideoPlayer(activeVideo)}
-
-                <div>
-                  <h2 className="text-xl font-extrabold font-tajawal text-[#071A3D] dark:text-white">
-                    {activeVideo.title}
-                  </h2>
-                  {activeVideo.description && (
-                    <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 mt-2 leading-relaxed whitespace-pre-wrap bg-[#BCEBFF]/10 dark:bg-[#071A3D]/50 p-4 rounded-2xl border border-[#BCEBFF]/30">
-                      {activeVideo.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="p-4 bg-[#BCEBFF]/10 dark:bg-[#071A3D]/70 border-t border-[#BCEBFF]/40 dark:border-[#16958E]/30 text-center">
-                <button
-                  onClick={() => setActiveVideo(null)}
-                  className="px-6 py-2.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-md transition-all"
-                >
-                  إغلاق الفيديو
-                </button>
-              </div>
-            </motion.div>
+            <div>
+              <h2 className="text-xl font-extrabold font-tajawal text-[#071A3D] dark:text-white">
+                {activeVideo.title}
+              </h2>
+              {activeVideo.description && (
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 mt-2 leading-relaxed whitespace-pre-wrap bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-white/10">
+                  {activeVideo.description}
+                </p>
+              )}
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </Modal>
+      )}
+
 
     </div>
   );

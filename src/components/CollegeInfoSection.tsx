@@ -38,7 +38,7 @@ export const CollegeInfoSection: React.FC<CollegeInfoSectionProps> = ({
       <div className="flex items-center justify-between mb-8">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-sm transition-all"
+          className="inline-flex items-center gap-2 h-9 sm:h-10 px-3.5 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] dark:text-[#BCEBFF] font-bold text-xs sm:text-sm transition-all"
         >
           <ArrowRight className="w-4 h-4" />
           <span>الرجوع للرئيسية</span>

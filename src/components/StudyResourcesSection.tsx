@@ -34,7 +34,7 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
         <div>
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-sm transition-all mb-4"
+            className="inline-flex items-center gap-2 h-9 sm:h-10 px-3.5 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] dark:text-[#BCEBFF] font-bold text-xs sm:text-sm transition-all mb-4"
           >
             <ArrowRight className="w-4 h-4" />
             <span>الرجوع للرئيسية</span>
@@ -58,7 +58,7 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
           href="http://t.me/Daleelak_AlJamaei_bot"
           target="_blank"
           rel="noopener noreferrer"
-          className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#071A3D] to-[#16958E] hover:from-[#0a2558] hover:to-[#1ba8a0] text-white font-bold text-sm shadow-lg shadow-[#071A3D]/25 flex items-center gap-2 active:scale-95 transition-all"
+          className="h-11 sm:h-12 px-5 sm:px-6 rounded-2xl bg-gradient-to-r from-[#071A3D] to-[#16958E] hover:from-[#0a2558] hover:to-[#1ba8a0] text-white font-bold text-xs sm:text-sm shadow-lg shadow-[#071A3D]/25 flex items-center justify-center gap-2 active:scale-95 transition-all"
         >
           <Send className="w-5 h-5 rotate-180 text-[#BCEBFF]" />
           <span>فتح بوت التلجرام</span>
@@ -103,7 +103,7 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
       <div className="flex items-center gap-2 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30 pb-4 mb-8 overflow-x-auto scrollbar-none">
         <button
           onClick={() => setFilterCategory('all')}
-          className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+          className={`h-9 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center ${
             filterCategory === 'all'
               ? 'bg-[#071A3D] text-white shadow-sm'
               : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'
@@ -114,7 +114,7 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
 
         <button
           onClick={() => setFilterCategory('telegram')}
-          className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+          className={`h-9 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center ${
             filterCategory === 'telegram'
               ? 'bg-[#071A3D] text-white shadow-sm'
               : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'
@@ -125,7 +125,7 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
 
         <button
           onClick={() => setFilterCategory('book')}
-          className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+          className={`h-9 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center ${
             filterCategory === 'book'
               ? 'bg-[#071A3D] text-white shadow-sm'
               : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'
@@ -136,7 +136,7 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
 
         <button
           onClick={() => setFilterCategory('video')}
-          className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+          className={`h-9 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center ${
             filterCategory === 'video'
               ? 'bg-[#071A3D] text-white shadow-sm'
               : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'
@@ -147,7 +147,7 @@ export const StudyResourcesSection: React.FC<StudyResourcesSectionProps> = ({ on
 
         <button
           onClick={() => setFilterCategory('notes')}
-          className={`px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+          className={`h-9 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center ${
             filterCategory === 'notes'
               ? 'bg-[#071A3D] text-white shadow-sm'
               : 'bg-[#BCEBFF]/20 dark:bg-[#071A3D]/50 text-[#071A3D] dark:text-slate-300 hover:bg-[#BCEBFF]/40'

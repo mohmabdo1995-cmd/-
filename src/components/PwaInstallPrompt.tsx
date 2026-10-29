@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Download, X, CheckCircle2, Zap, WifiOff, Bell, Share2, PlusSquare, Sparkles, ExternalLink, GraduationCap, AlertCircle, HelpCircle, ChevronDown, ChevronUp, Smartphone } from 'lucide-react';
+import { Modal } from './common/Modal';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -199,28 +200,23 @@ export const PwaInstallPrompt: React.FC = () => {
       )}
 
       {/* Modal Dialog (Educational Platform Style - موقع الديوان) */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#071A3D]/80 backdrop-blur-md animate-fade-in overflow-y-auto" 
-          dir="rtl"
-          onClick={handleDismiss}
-        >
-          <div
-            className="w-full max-w-md bg-white dark:bg-[#071A3D] rounded-3xl p-6 sm:p-7 border border-[#BCEBFF]/80 dark:border-[#16958E]/40 shadow-2xl relative overflow-hidden text-slate-800 dark:text-white transition-all transform animate-scale-in my-auto max-h-[92vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+      <Modal
+        isOpen={isOpen}
+        onClose={handleDismiss}
+        maxWidth="md"
+        showHeader={false}
+        bodyClassName="p-6 sm:p-7"
+      >
+        <div className="relative text-slate-800 dark:text-white text-right">
+          {/* Close button */}
+          <button
+            onClick={handleDismiss}
+            className="absolute top-0 left-0 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+            title="إغلاق"
+            aria-label="إغلاق نافذة التثبيت"
           >
-            {/* Top decorative gradient bar */}
-            <div className="absolute top-0 right-0 left-0 h-2 bg-gradient-to-r from-[#071A3D] via-[#16958E] to-[#BCEBFF]" />
-
-            {/* Close button */}
-            <button
-              onClick={handleDismiss}
-              className="absolute top-3.5 left-3.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-[#BCEBFF]/20 transition-colors cursor-pointer"
-              title="إغلاق"
-              aria-label="إغلاق نافذة التثبيت"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <X className="w-5 h-5" />
+          </button>
 
             {/* Header Content with Graduation Cap Logo */}
             <div className="text-center mt-2 mb-4">
@@ -458,8 +454,7 @@ export const PwaInstallPrompt: React.FC = () => {
               لا يشغل أي مساحة من الذاكرة • آمن وموثوق بنسبة 100%
             </p>
           </div>
-        </div>
-      )}
+      </Modal>
     </>
   );
 };

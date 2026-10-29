@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { Calculator, Plus, Trash2, Award, RotateCcw } from 'lucide-react';
 import { GpaCourse } from '../types';
 import { StorageService } from '../services/storage';
-import { Calculator, Plus, Trash2, Award, RotateCcw, X } from 'lucide-react';
+import { Modal } from './common/Modal';
 
 interface GpaCalculatorModalProps {
   isOpen: boolean;
@@ -32,8 +32,6 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
       setCourses(StorageService.getGpaCourses());
     }
   }, [isOpen]);
-
-  if (!isOpen) return null;
 
   const handleAddCourse = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,32 +72,17 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
   const gpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="w-full max-w-xl bg-white dark:bg-[#071A3D] rounded-3xl p-6 sm:p-8 border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-2xl max-h-[90vh] overflow-y-auto"
-      >
-        <div className="flex items-center justify-between pb-4 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#16958E]/15 text-[#16958E] flex items-center justify-center">
-              <Calculator className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold font-tajawal text-[#071A3D] dark:text-white">حاسبة المعدل التراكمي (GPA)</h3>
-              <span className="text-xs text-slate-500">حساب الساعات والدرجات التقديرية</span>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#BCEBFF]/30 text-[#071A3D] hover:bg-[#BCEBFF]/60 flex items-center justify-center"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      maxWidth="xl"
+      title="حاسبة المعدل التراكمي (GPA)"
+      subtitle="حساب الساعات والدرجات التقديرية بدقة"
+      icon={<Calculator className="w-5 h-5 text-[#16958E]" />}
+    >
+      <div className="space-y-6">
         {/* GPA Result Display Box */}
-        <div className="p-6 rounded-2xl bg-gradient-to-r from-[#071A3D] via-[#0a2558] to-[#16958E] text-white mb-6 flex items-center justify-between shadow-lg">
+        <div className="p-6 rounded-2xl bg-gradient-to-r from-[#071A3D] via-[#0a2558] to-[#16958E] text-white flex items-center justify-between shadow-lg">
           <div>
             <span className="text-xs text-[#BCEBFF] font-bold block mb-1">المعدل التراكمي المحسوب</span>
             <div className="text-4xl font-extrabold font-mono tracking-tight">{gpa} / 4.00</div>
@@ -109,7 +92,7 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
         </div>
 
         {/* Add Course Form */}
-        <form onSubmit={handleAddCourse} className="p-4 rounded-2xl bg-[#BCEBFF]/10 dark:bg-[#071A3D]/60 border border-[#BCEBFF]/50 dark:border-[#16958E]/30 mb-6 space-y-3">
+        <form onSubmit={handleAddCourse} className="p-4 rounded-2xl bg-[#BCEBFF]/10 dark:bg-[#071A3D]/60 border border-[#BCEBFF]/50 dark:border-[#16958E]/30 space-y-3">
           <div className="font-bold text-xs text-[#071A3D] dark:text-slate-300">إضافة مادة جديدة للحساب:</div>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -146,7 +129,7 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
 
           <button
             type="submit"
-            className="w-full py-2.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>إضافة إلى قائمة المواد</span>
@@ -154,35 +137,40 @@ export const GpaCalculatorModal: React.FC<GpaCalculatorModalProps> = ({ isOpen, 
         </form>
 
         {/* Courses Table */}
-        <div className="space-y-2 mb-6">
+        <div className="space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-slate-500 px-2">
             <span>المقررات المضافة ({courses.length})</span>
             {courses.length > 0 && (
-              <button onClick={handleReset} className="text-rose-500 hover:underline flex items-center gap-1">
+              <button onClick={handleReset} className="text-rose-500 hover:underline flex items-center gap-1 cursor-pointer">
                 <RotateCcw className="w-3 h-3" /> إعادة ضبط
               </button>
             )}
           </div>
 
-          {courses.map((course) => (
-            <div key={course.id} className="p-3 rounded-xl bg-[#BCEBFF]/15 dark:bg-[#071A3D]/40 border border-[#BCEBFF]/40 dark:border-[#16958E]/20 flex items-center justify-between text-xs">
-              <div>
-                <span className="font-bold text-[#071A3D] dark:text-white block">{course.name}</span>
-                <span className="text-slate-500">{course.credits} ساعات معتمدة</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="px-2.5 py-1 rounded-lg bg-[#16958E]/20 text-[#16958E] font-bold font-mono">
-                  {course.gradeLetter} ({course.gradePoint})
-                </span>
-                <button onClick={() => handleDeleteCourse(course.id)} className="text-slate-400 hover:text-rose-600">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+          {courses.length === 0 ? (
+            <div className="p-4 rounded-xl text-center text-xs text-slate-400 bg-slate-50 dark:bg-white/5 border border-dashed border-slate-200 dark:border-white/10">
+              لم تقم بإضافة مواد بعد. أدخل اسم المادة والساعات والتقدير بالأعلى واضغط إضافة.
             </div>
-          ))}
+          ) : (
+            courses.map((course) => (
+              <div key={course.id} className="p-3 rounded-xl bg-[#BCEBFF]/15 dark:bg-[#071A3D]/40 border border-[#BCEBFF]/40 dark:border-[#16958E]/20 flex items-center justify-between text-xs">
+                <div>
+                  <span className="font-bold text-[#071A3D] dark:text-white block">{course.name}</span>
+                  <span className="text-slate-500">{course.credits} ساعات معتمدة</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="px-2.5 py-1 rounded-lg bg-[#16958E]/20 text-[#16958E] font-bold font-mono">
+                    {course.gradeLetter} ({course.gradePoint})
+                  </span>
+                  <button onClick={() => handleDeleteCourse(course.id)} className="text-slate-400 hover:text-rose-600 cursor-pointer">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
-
-      </motion.div>
-    </div>
+      </div>
+    </Modal>
   );
 };

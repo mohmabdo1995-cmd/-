@@ -19,6 +19,7 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminDashboardLayout } from './components/admin/AdminDashboardLayout';
 import { ArticlesSection } from './components/ArticlesSection';
 import { VideoLibrarySection } from './components/VideoLibrarySection';
+import { NewsTickerBar } from './components/NewsTickerBar';
 
 export default function App() {
   const [activePage, setActivePage] = useState<ActivePage>('landing');
@@ -161,6 +162,12 @@ export default function App() {
           setOpenScheduleAddModal(true);
           handleNavigate('schedule');
         }}
+      />
+
+      {/* Breaking News Ticker Bar directly under Header */}
+      <NewsTickerBar
+        siteConfig={siteConfig}
+        onNavigate={(p) => handleNavigate(p)}
       />
 
       {/* Main Content Render */}

@@ -9,6 +9,7 @@ import {
   CalendarDays, ChevronRight, ChevronLeft, List, CalendarCheck, BookOpen
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { Modal } from './common/Modal';
 
 interface ScheduleSectionProps {
   onBack: () => void;
@@ -384,7 +385,7 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
         <div>
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] font-bold text-sm transition-all mb-4"
+            className="inline-flex items-center gap-2 h-9 sm:h-10 px-3.5 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] dark:text-[#BCEBFF] font-bold text-xs sm:text-sm transition-all mb-4"
           >
             <ArrowRight className="w-4 h-4" />
             <span>الرجوع للرئيسية</span>
@@ -403,12 +404,12 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
           </p>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        {/* Action Controls - Unified height & proportion */}
+        <div className="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto">
           {notifPermission !== 'granted' && (
             <button
               onClick={handleRequestNotifPermission}
-              className="flex-1 md:flex-none px-4 py-3 rounded-2xl bg-[#BCEBFF]/30 border border-[#16958E]/40 text-[#071A3D] font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#BCEBFF]/60 transition-all shadow-sm"
+              className="flex-1 md:flex-none h-11 sm:h-12 px-4 sm:px-5 rounded-2xl bg-[#BCEBFF]/30 border border-[#16958E]/40 text-[#071A3D] dark:text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 hover:bg-[#BCEBFF]/60 transition-all shadow-sm active:scale-95"
             >
               <Bell className="w-4 h-4 text-[#16958E] animate-bounce" />
               <span>تفعيل التنبيهات</span>
@@ -417,7 +418,7 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
 
           <button
             onClick={handleOpenAddModal}
-            className="flex-1 md:flex-none px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#071A3D] to-[#16958E] hover:from-[#0a2558] hover:to-[#1ba8a0] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#071A3D]/25 hover:scale-105 active:scale-95 transition-all"
+            className="flex-1 md:flex-none h-11 sm:h-12 px-5 sm:px-6 rounded-2xl bg-gradient-to-r from-[#071A3D] to-[#16958E] hover:from-[#0a2558] hover:to-[#1ba8a0] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#071A3D]/25 hover:scale-105 active:scale-95 transition-all"
           >
             <Plus className="w-5 h-5 stroke-[2.5]" />
             <span>إضافة محاضرة جديدة</span>
@@ -430,7 +431,7 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
         <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-[#BCEBFF]/25 dark:bg-[#071A3D]/70 border border-[#BCEBFF]/60 dark:border-[#16958E]/30 w-full sm:w-auto">
           <button
             onClick={() => setViewMode('calendar')}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            className={`flex-1 sm:flex-none h-10 flex items-center justify-center gap-2 px-4 sm:px-5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
               viewMode === 'calendar'
                 ? 'bg-gradient-to-r from-[#071A3D] to-[#16958E] text-white shadow-md'
                 : 'text-[#071A3D] dark:text-slate-300 hover:text-[#16958E]'
@@ -442,7 +443,7 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
 
           <button
             onClick={() => setViewMode('list')}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            className={`flex-1 sm:flex-none h-10 flex items-center justify-center gap-2 px-4 sm:px-5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
               viewMode === 'list'
                 ? 'bg-gradient-to-r from-[#071A3D] to-[#16958E] text-white shadow-md'
                 : 'text-[#071A3D] dark:text-slate-300 hover:text-[#16958E]'
@@ -459,7 +460,7 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
             <select
               value={calendarSubjectFilter}
               onChange={(e) => setCalendarSubjectFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 text-xs font-bold text-[#071A3D] dark:text-white outline-none focus:ring-2 focus:ring-[#16958E]"
+              className="h-10 px-3 rounded-xl bg-white dark:bg-[#071A3D] border border-[#BCEBFF]/80 dark:border-[#16958E]/30 text-xs font-bold text-[#071A3D] dark:text-white outline-none focus:ring-2 focus:ring-[#16958E]"
             >
               <option value="all">جميع المواد ({lectures.length})</option>
               {SUBJECT_OPTIONS.map((sub) => (
@@ -482,7 +483,7 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
               <button
                 onClick={goToPrevMonth}
                 title="الشهر السابق"
-                className="p-2.5 rounded-2xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] dark:text-[#BCEBFF] border border-[#16958E]/30 transition-all active:scale-95"
+                className="w-10 h-10 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] dark:text-[#BCEBFF] border border-[#16958E]/30 flex items-center justify-center transition-all active:scale-95"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -499,7 +500,7 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
               <button
                 onClick={goToNextMonth}
                 title="الشهر القادم"
-                className="p-2.5 rounded-2xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] dark:text-[#BCEBFF] border border-[#16958E]/30 transition-all active:scale-95"
+                className="w-10 h-10 rounded-xl bg-[#BCEBFF]/30 hover:bg-[#BCEBFF]/60 text-[#071A3D] dark:text-[#BCEBFF] border border-[#16958E]/30 flex items-center justify-center transition-all active:scale-95"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -509,13 +510,13 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={goToToday}
-                className="px-3.5 py-1.5 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+                className="h-10 px-4 rounded-xl bg-[#071A3D] hover:bg-[#16958E] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 active:scale-95"
               >
                 <CalendarCheck className="w-3.5 h-3.5 text-[#BCEBFF]" />
                 <span>العودة لليوم</span>
               </button>
 
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#BCEBFF]/20 dark:bg-[#071A3D]/60 border border-[#BCEBFF]/40 dark:border-[#16958E]/30 text-xs font-medium">
+              <div className="h-10 flex items-center gap-2 px-3.5 rounded-xl bg-[#BCEBFF]/20 dark:bg-[#071A3D]/60 border border-[#BCEBFF]/40 dark:border-[#16958E]/30 text-xs font-medium">
                 <span className="text-slate-500 dark:text-slate-400">محاضرات الشهر:</span>
                 <span className="font-bold font-mono text-[#071A3D] dark:text-white">{monthLecturesCount}</span>
                 <span className="text-slate-300 dark:text-slate-600">•</span>
@@ -1081,26 +1082,15 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
       )}
 
       {/* Add / Edit Lecture Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="w-full max-w-lg bg-white dark:bg-[#071A3D] rounded-3xl p-6 sm:p-8 border border-[#BCEBFF]/80 dark:border-[#16958E]/30 shadow-2xl max-h-[90vh] overflow-y-auto"
-          >
-            <div className="flex items-center justify-between pb-4 border-b border-[#BCEBFF]/40 dark:border-[#16958E]/30 mb-6">
-              <h3 className="text-xl font-bold font-tajawal text-[#071A3D] dark:text-white">
-                {editingLecture ? 'تعديل بيانات المحاضرة' : 'إضافة محاضرة جديدة إلى الجدول'}
-              </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-[#BCEBFF]/30 text-[#071A3D] hover:bg-[#BCEBFF]/60 flex items-center justify-center"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveLecture} className="space-y-4 text-right">
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        maxWidth="lg"
+        title={editingLecture ? 'تعديل بيانات المحاضرة' : 'إضافة محاضرة جديدة إلى الجدول'}
+        subtitle="توثيق موعد القاعة والمحاضر في الجدول الدراسي"
+        icon={<Calendar className="w-5 h-5 text-[#16958E]" />}
+      >
+        <form onSubmit={handleSaveLecture} className="space-y-4 text-right">
               {/* Lecture Name */}
               <div>
                 <label className="block text-xs font-bold text-[#071A3D] dark:text-slate-300 mb-1">
@@ -1268,11 +1258,8 @@ export const ScheduleSection: React.FC<ScheduleSectionProps> = ({ onBack, openAd
                   {editingLecture ? 'حفظ التعديلات' : 'إضافة المحاضرة'}
                 </button>
               </div>
-
             </form>
-          </motion.div>
-        </div>
-      )}
+      </Modal>
 
     </div>
   );

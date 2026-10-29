@@ -6,15 +6,16 @@ import {
   Plus, Trash2, Eye, EyeOff, Download, Upload, Clock, Layers, Sparkles,
   BookOpen, Calendar, HelpCircle, ExternalLink, Globe, Phone, Mail, MapPin,
   Video, Play, MoveUp, MoveDown, Heading, Bold, Italic, List, ListOrdered,
-  Quote, ImageIcon, FileCode, Check, X, ArrowRight, Edit3, Film, AlertTriangle
+  Quote, ImageIcon, FileCode, Check, X, ArrowRight, Edit3, Film, AlertTriangle, Radio
 } from 'lucide-react';
 import {
   FirebaseService, SiteConfig, DEFAULT_SITE_CONFIG, SectionVisibility,
   AnnouncementItem, MediaItem, AdminLogItem, ButtonConfig
 } from '../../services/firebase';
 import { AdminAuthService } from '../../services/adminAuth';
-import { ArticleItem, VideoItem, CollegeInfoData, Subject } from '../../types';
+import { ArticleItem, VideoItem, CollegeInfoData, Subject, TickerItem } from '../../types';
 import { COLLEGE_INFO, SUBJECTS_DATA } from '../../data/academicContent';
+import { Modal } from '../common/Modal';
 
 interface AdminDashboardLayoutProps {
   onCloseAdmin: () => void;
@@ -22,6 +23,7 @@ interface AdminDashboardLayoutProps {
 
 type AdminTab =
   | 'overview'
+  | 'ticker'
   | 'articles'
   | 'college_sections'
   | 'videos'
@@ -52,9 +54,14 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
     customSections: []
   });
   const [subjects, setSubjects] = useState<Subject[]>(SUBJECTS_DATA);
+  const [tickerItems, setTickerItems] = useState<TickerItem[]>([]);
 
   const [isSaving, setIsSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // --- Ticker Editor Modal States ---
+  const [isTickerModalOpen, setIsTickerModalOpen] = useState(false);
+  const [editingTickerItem, setEditingTickerItem] = useState<Partial<TickerItem> | null>(null);
 
   // --- Article Editor Modal States ---
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
@@ -98,6 +105,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
     const unsubscribeLogs = FirebaseService.subscribeAdminLogs((data) => setAdminLogs(data));
     const unsubscribeArt = FirebaseService.subscribeArticles((data) => setArticles(data));
     const unsubscribeVid = FirebaseService.subscribeVideos((data) => setVideos(data));
+    const unsubscribeTicker = FirebaseService.subscribeTicker((data) => setTickerItems(data));
     const unsubscribeCollege = FirebaseService.subscribeCollegeInfo((data) => setCollegeInfo(data));
     const unsubscribeSubj = FirebaseService.subscribeSubjects((data) => setSubjects(data));
 
@@ -108,6 +116,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
       unsubscribeLogs();
       unsubscribeArt();
       unsubscribeVid();
+      unsubscribeTicker();
       unsubscribeCollege();
       unsubscribeSubj();
     };
@@ -333,6 +342,80 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
     }
   };
 
+  // --- Save / Update Ticker Item ---
+  const handleSaveTickerItem = async () => {
+    if (!editingTickerItem?.text?.trim()) {
+      showToast('يرجى كتابة نص الخبر أو التنبيه');
+      return;
+    }
+
+    try {
+      if (editingTickerItem.id) {
+        await FirebaseService.updateTickerItem(editingTickerItem.id, editingTickerItem);
+        showToast('تم تحديث الخبر بنجاح!');
+      } else {
+        await FirebaseService.addTickerItem({
+          text: editingTickerItem.text.trim(),
+          badge: editingTickerItem.badge?.trim() || 'إعلان',
+          link: editingTickerItem.link?.trim() || '',
+          visible: editingTickerItem.visible !== undefined ? editingTickerItem.visible : true,
+          order: tickerItems.length + 1
+        });
+        showToast('تمت إضافة الخبر إلى شريط الأخبار المتحرك!');
+      }
+      setIsTickerModalOpen(false);
+      setEditingTickerItem(null);
+    } catch (e) {
+      showToast('حدث خطأ أثناء حفظ الخبر');
+    }
+  };
+
+  const handleToggleTickerItem = async (id: string, currentVisible: boolean) => {
+    try {
+      await FirebaseService.updateTickerItem(id, { visible: !currentVisible });
+      showToast(`تم ${!currentVisible ? 'إظهار' : 'إخفاء'} الخبر`);
+    } catch (e) {
+      showToast('حدث خطأ أثناء تغيير حالة الخبر');
+    }
+  };
+
+  const handleDeleteTickerItem = async (id: string) => {
+    if (confirm('هل أنت متأكد من حذف هذا الخبر من الشريط المتحرك؟')) {
+      try {
+        await FirebaseService.deleteTickerItem(id);
+        showToast('تم حذف الخبر من الشريط');
+      } catch (e) {
+        showToast('حدث خطأ أثناء حذف الخبر');
+      }
+    }
+  };
+
+  const handleMoveTickerOrder = async (index: number, direction: 'up' | 'down') => {
+    if ((direction === 'up' && index === 0) || (direction === 'down' && index === tickerItems.length - 1)) return;
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const currentItem = tickerItems[index];
+    const targetItem = tickerItems[targetIndex];
+
+    try {
+      await FirebaseService.updateTickerItem(currentItem.id, { order: targetItem.order });
+      await FirebaseService.updateTickerItem(targetItem.id, { order: currentItem.order });
+      showToast('تم تحديث ترتيب الخبر');
+    } catch (e) {
+      showToast('حدث خطأ في تغيير الترتيب');
+    }
+  };
+
+  const handleResetDefaultTicker = async () => {
+    if (confirm('هل تريد استعادة الأخبار النموذجية الافتراضية للشريط؟')) {
+      try {
+        await FirebaseService.seedDefaultTickerItems();
+        showToast('تمت استعادة الأخبار الافتراضية بنجاح!');
+      } catch (e) {
+        showToast('حدث خطأ أثناء استعادة الأخبار');
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 font-cairo flex flex-col" dir="rtl">
       
@@ -411,6 +494,27 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
             >
               <LayoutDashboard className="w-4 h-4" />
               <span>نظرة عامة والملخص</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('ticker')}
+              className={`w-full text-right px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-between transition-all ${
+                activeTab === 'ticker'
+                  ? 'bg-[#071A3D] text-white shadow-md'
+                  : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Radio className="w-4 h-4 text-rose-500 animate-pulse" />
+                <span>شريط الأخبار المتحرك ✦</span>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                config.sectionVisibility?.newsTicker !== false
+                  ? 'bg-rose-100 text-rose-800'
+                  : 'bg-slate-200 text-slate-500'
+              }`}>
+                {tickerItems.length}
+              </span>
             </button>
 
             <button
@@ -589,6 +693,294 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
                     <span>تعديل نصوص الكلية</span>
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: NEWS TICKER BAR MANAGEMENT (شريط الأخبار المتحرك) */}
+          {activeTab === 'ticker' && (
+            <div className="space-y-6">
+              {/* Header Bar */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Radio className="w-5 h-5 text-rose-500 animate-pulse" />
+                    <h2 className="text-xl font-extrabold font-tajawal text-slate-900">إدارة شريط الأخبار المتحرك ✦</h2>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    إضافة وتعديل وحذف الأخبار المتحركة بشكل مستمر أسفل الشريط العلوي مع فاصل ✦ التلقائي
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={handleResetDefaultTicker}
+                    className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="استعادة الأخبار النموذجية"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>استعادة الافتراضي</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setEditingTickerItem({
+                        text: '',
+                        badge: 'إعلان',
+                        link: '',
+                        visible: true,
+                        order: tickerItems.length + 1
+                      });
+                      setIsTickerModalOpen(true);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md flex items-center gap-2 transition-all"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>إضافة خبر جديد</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Ticker Settings & Master Switch */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-slate-800">حالة ظهور الشريط في الموقع:</span>
+                    <button
+                      onClick={() => handleToggleSection('newsTicker', !(config.sectionVisibility?.newsTicker !== false))}
+                      className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                        config.sectionVisibility?.newsTicker !== false
+                          ? 'bg-emerald-600 text-white shadow'
+                          : 'bg-slate-300 text-slate-600'
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${config.sectionVisibility?.newsTicker !== false ? 'bg-white animate-pulse' : 'bg-slate-500'}`}></span>
+                      <span>{config.sectionVisibility?.newsTicker !== false ? 'مفعل ON (ظاهر للجميع)' : 'معطل OFF (مخفي)'}</span>
+                    </button>
+                  </div>
+
+                  {/* Ticker Speed Selector */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-700">سرعة الحركة:</span>
+                    <div className="inline-flex rounded-xl bg-slate-200 p-0.5">
+                      {(['slow', 'normal', 'fast'] as const).map((spd) => (
+                        <button
+                          key={spd}
+                          onClick={async () => {
+                            const newCfg = { ...config, tickerSpeed: spd };
+                            setConfig(newCfg);
+                            await FirebaseService.updateSiteConfig(newCfg);
+                            showToast(`تم ضبط سرعة الشريط: ${spd === 'slow' ? 'بطيء' : spd === 'fast' ? 'سريع' : 'عادي'}`);
+                          }}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                            (config.tickerSpeed || 'normal') === spd
+                              ? 'bg-white text-slate-900 shadow-sm'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          {spd === 'slow' ? 'بطيء' : spd === 'fast' ? 'سريع' : 'عادي'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ticker Title Input */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <label className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                    عنوان الشارة (اليمين):
+                  </label>
+                  <div className="flex-1 flex gap-2">
+                    <input
+                      type="text"
+                      value={config.tickerTitle || 'شريط الأخبار'}
+                      onChange={(e) => setConfig({ ...config, tickerTitle: e.target.value })}
+                      placeholder="مثال: شريط الأخبار أو تنبيهات هامة"
+                      className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold flex-1"
+                    />
+                    <button
+                      onClick={handleSaveConfig}
+                      className="px-3.5 py-1.5 bg-[#071A3D] text-white rounded-xl text-xs font-bold hover:bg-[#0E2F5A] transition-colors"
+                    >
+                      حفظ العنوان
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Preview Box */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>معاينة حية لشريط الأخبار كما يظهر للزوار (مع فاصل ✦):</span>
+                  </span>
+                  <span className="text-[11px] text-slate-400">مرر الفأرة فوق الشريط لإيقافه مؤقتاً</span>
+                </div>
+
+                <div
+                  dir="rtl"
+                  className="rounded-2xl bg-[#071A3D] border border-[#16958E]/40 text-white shadow-md overflow-hidden select-none p-0.5"
+                  style={{ background: 'linear-gradient(90deg, #051430 0%, #071A3D 50%, #0E2F5A 100%)' }}
+                >
+                  <div className="flex items-stretch h-10">
+                    <div className="flex-shrink-0 z-10 flex items-center gap-1.5 px-3 bg-gradient-to-l from-[#16958E] to-[#0E2F5A] border-l border-[#BCEBFF]/20 shadow-md">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                      </span>
+                      <Radio className="w-3 h-3 text-[#BCEBFF]" />
+                      <span className="text-xs font-black font-tajawal text-white whitespace-nowrap">
+                        {config.tickerTitle || 'شريط الأخبار'}
+                      </span>
+                    </div>
+
+                    <div className="relative flex-1 flex items-center overflow-hidden">
+                      <div className="animate-ticker flex items-center gap-6 py-1 whitespace-nowrap">
+                        {[...tickerItems, ...tickerItems].filter(i => i.visible !== false).map((item, idx) => (
+                          <div key={`prev-${item.id}-${idx}`} className="flex items-center gap-2">
+                            {item.badge && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                                {item.badge}
+                              </span>
+                            )}
+                            <span className="text-xs font-medium text-slate-100">{item.text}</span>
+                            <span className="text-amber-400 font-extrabold text-sm mr-2 drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]">
+                              ✦
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ticker Items List */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-extrabold text-slate-800 font-tajawal">
+                    قائمة الأخبار والنصوص المدخلة ({tickerItems.length}):
+                  </h3>
+                  <span className="text-xs text-slate-500">
+                    يفصل بين كل خبر وآخر رمز ✦ تلقائياً
+                  </span>
+                </div>
+
+                {tickerItems.length === 0 ? (
+                  <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-200">
+                    <Radio className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                    <p className="text-xs font-bold text-slate-500">لا توجد أخبار في الشريط حالياً</p>
+                    <button
+                      onClick={handleResetDefaultTicker}
+                      className="mt-3 px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold"
+                    >
+                      استعادة الأخبار النموذجية
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {tickerItems.map((item, idx) => (
+                      <div
+                        key={item.id}
+                        className={`p-3 sm:p-4 rounded-2xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+                          item.visible !== false
+                            ? 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                            : 'bg-slate-100/60 border-slate-200 opacity-60'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {/* Order Badges & Direction Controls */}
+                          <div className="flex items-center gap-1">
+                            <span className="w-6 h-6 rounded-lg bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center">
+                              {idx + 1}
+                            </span>
+                            <div className="flex flex-col gap-0.5">
+                              <button
+                                onClick={() => handleMoveTickerOrder(idx, 'up')}
+                                disabled={idx === 0}
+                                className="p-0.5 rounded hover:bg-slate-200 disabled:opacity-20 text-slate-600"
+                                title="تحريك لأعلى"
+                              >
+                                <MoveUp className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={() => handleMoveTickerOrder(idx, 'down')}
+                                disabled={idx === tickerItems.length - 1}
+                                className="p-0.5 rounded hover:bg-slate-200 disabled:opacity-20 text-slate-600"
+                                title="تحريك لأسفل"
+                              >
+                                <MoveDown className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Badge Tag */}
+                          {item.badge && (
+                            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 border border-rose-200 whitespace-nowrap">
+                              {item.badge}
+                            </span>
+                          )}
+
+                          {/* News Item Text & Link */}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs sm:text-sm font-bold text-slate-800 break-words leading-relaxed">
+                              {item.text}
+                            </p>
+                            {item.link && (
+                              <span className="text-[11px] text-blue-600 flex items-center gap-1 mt-0.5 font-mono">
+                                <ExternalLink className="w-3 h-3" />
+                                <span>{item.link}</span>
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Golden Star indicator */}
+                          <span className="text-amber-500 font-bold text-base hidden sm:inline" title="رمز الفاصل بين الأخبار">
+                            ✦
+                          </span>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex items-center gap-2 self-end sm:self-center">
+                          {/* Toggle Visibility */}
+                          <button
+                            onClick={() => handleToggleTickerItem(item.id, item.visible !== false)}
+                            className={`p-2 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors ${
+                              item.visible !== false
+                                ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                                : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                            }`}
+                            title={item.visible !== false ? 'إخفاء من الشريط' : 'إظهار في الشريط'}
+                          >
+                            {item.visible !== false ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                          </button>
+
+                          {/* Edit Item */}
+                          <button
+                            onClick={() => {
+                              setEditingTickerItem(item);
+                              setIsTickerModalOpen(true);
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold flex items-center gap-1 transition-colors"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>تعديل</span>
+                          </button>
+
+                          {/* Delete Item */}
+                          <button
+                            onClick={() => handleDeleteTickerItem(item.id)}
+                            className="p-2 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 transition-colors"
+                            title="حذف الخبر"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1361,25 +1753,32 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
       </div>
 
       {/* ARTICLE EDITOR MODAL */}
-      <AnimatePresence>
-        {isArticleModalOpen && editingArticle && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm" dir="rtl">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-3xl bg-white rounded-3xl border border-slate-200 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden"
-            >
-              <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                <h3 className="font-extrabold font-tajawal text-slate-900 text-base">
-                  {editingArticle.id ? 'تعديل المقال' : 'إنشاء مقال جديد'}
-                </h3>
-                <button onClick={() => setIsArticleModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-6 overflow-y-auto space-y-4">
+      {isArticleModalOpen && editingArticle && (
+        <Modal
+          isOpen={isArticleModalOpen && Boolean(editingArticle)}
+          onClose={() => setIsArticleModalOpen(false)}
+          maxWidth="3xl"
+          title={editingArticle.id ? 'تعديل المقال' : 'إنشاء مقال جديد'}
+          subtitle="تحرير المقال ومحتواه ونشره للطلاب"
+          icon={<FileText className="w-5 h-5 text-blue-600" />}
+          footer={
+            <>
+              <button
+                onClick={() => setIsArticleModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-300 cursor-pointer"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleSaveArticle}
+                className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md cursor-pointer"
+              >
+                حفظ المقال
+              </button>
+            </>
+          }
+        >
+          <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">عنوان المقال الرئيسي:*</label>
@@ -1546,48 +1945,27 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
                     <span>حفظ كمسودة (Draft)</span>
                   </label>
                 </div>
-              </div>
-
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button
-                  onClick={() => setIsArticleModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-300"
-                >
-                  إلغاء
-                </button>
-
-                <button
-                  onClick={handleSaveArticle}
-                  className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md"
-                >
-                  حفظ المقال
-                </button>
-              </div>
-            </motion.div>
           </div>
-        )}
-      </AnimatePresence>
+        </Modal>
+      )}
 
       {/* VIDEO EDITOR MODAL */}
-      <AnimatePresence>
-        {isVideoModalOpen && editingVideo && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm" dir="rtl">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-2xl bg-white rounded-3xl border border-slate-200 shadow-2xl flex flex-col overflow-hidden"
-            >
-              <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                <h3 className="font-extrabold font-tajawal text-slate-900 text-base">
-                  {editingVideo.id ? 'تعديل معلومات الفيديو' : 'رفع/إضافة فيديو جديد'}
-                </h3>
-                <button onClick={() => setIsVideoModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-6 overflow-y-auto space-y-4">
+      {isVideoModalOpen && editingVideo && (
+        <Modal
+          isOpen={isVideoModalOpen && Boolean(editingVideo)}
+          onClose={() => setIsVideoModalOpen(false)}
+          maxWidth="2xl"
+          title={editingVideo.id ? 'تعديل معلومات الفيديو' : 'رفع/إضافة فيديو جديد'}
+          subtitle="إضافة وتعديل شروحات ومحاضرات الفيديو"
+          icon={<Film className="w-5 h-5 text-indigo-600" />}
+          footer={
+            <>
+              <button onClick={() => setIsVideoModalOpen(false)} className="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl cursor-pointer">إلغاء</button>
+              <button onClick={handleSaveVideo} className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer">حفظ الفيديو</button>
+            </>
+          }
+        >
+          <div className="space-y-4">
                 {videoFileError && (
                   <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 flex-shrink-0" />
@@ -1682,35 +2060,27 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
                     <span>إظهار الفيديو للطلاب (نشر)</span>
                   </label>
                 </div>
-              </div>
-
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button onClick={() => setIsVideoModalOpen(false)} className="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">إلغاء</button>
-                <button onClick={handleSaveVideo} className="px-6 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-md">حفظ الفيديو</button>
-              </div>
-            </motion.div>
           </div>
-        )}
-      </AnimatePresence>
+        </Modal>
+      )}
 
       {/* SUBJECT EDITOR MODAL */}
-      <AnimatePresence>
-        {isSubjectModalOpen && editingSubject && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm" dir="rtl">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-xl bg-white rounded-3xl border border-slate-200 shadow-2xl flex flex-col overflow-hidden"
-            >
-              <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                <h3 className="font-extrabold font-tajawal text-slate-900 text-base">تعديل المادة الأكاديمية</h3>
-                <button onClick={() => setIsSubjectModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-6 overflow-y-auto space-y-3">
+      {isSubjectModalOpen && editingSubject && (
+        <Modal
+          isOpen={isSubjectModalOpen && Boolean(editingSubject)}
+          onClose={() => setIsSubjectModalOpen(false)}
+          maxWidth="xl"
+          title="تعديل المادة الأكاديمية"
+          subtitle="تعديل اسم وبيانات المادة والمقررات الدراسية"
+          icon={<BookOpen className="w-5 h-5 text-purple-600" />}
+          footer={
+            <>
+              <button onClick={() => setIsSubjectModalOpen(false)} className="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl cursor-pointer">إلغاء</button>
+              <button onClick={handleSaveSubject} className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer">حفظ المادة</button>
+            </>
+          }
+        >
+          <div className="space-y-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">اسم المادة بالعربي:*</label>
                   <input
@@ -1775,16 +2145,126 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
                     className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs"
                   />
                 </div>
-              </div>
-
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button onClick={() => setIsSubjectModalOpen(false)} className="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">إلغاء</button>
-                <button onClick={handleSaveSubject} className="px-6 py-2 bg-purple-600 text-white text-xs font-bold rounded-xl shadow-md">حفظ المادة</button>
-              </div>
-            </motion.div>
           </div>
-        )}
-      </AnimatePresence>
+        </Modal>
+      )}
+
+      {/* TICKER ITEM EDITOR MODAL */}
+      {isTickerModalOpen && editingTickerItem && (
+        <Modal
+          isOpen={isTickerModalOpen && Boolean(editingTickerItem)}
+          onClose={() => setIsTickerModalOpen(false)}
+          maxWidth="lg"
+          title={editingTickerItem.id ? 'تعديل خبر في الشريط المتحرك' : 'إضافة خبر جديد للشريط المتحرك'}
+          subtitle="يظهر التنبيه أو الخبر بشكل فوري ومستمر في الشريط المتحرك"
+          icon={<Radio className="w-5 h-5 text-rose-500 animate-pulse" />}
+          footer={
+            <>
+              <button
+                onClick={() => setIsTickerModalOpen(false)}
+                className="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-300 transition-colors cursor-pointer"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleSaveTickerItem}
+                className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <Check className="w-4 h-4" />
+                <span>{editingTickerItem.id ? 'حفظ التعديلات' : 'إضافة للشريط'}</span>
+              </button>
+            </>
+          }
+        >
+          <div className="space-y-4">
+                {/* News Text */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-bold text-slate-700">
+                      نص الخبر أو التنبيه:*
+                    </label>
+                    <span className="text-[11px] text-amber-600 font-bold">
+                      سيظهر فاصل ✦ بعده تلقائياً
+                    </span>
+                  </div>
+                  <textarea
+                    rows={3}
+                    value={editingTickerItem.text || ''}
+                    onChange={(e) => setEditingTickerItem({ ...editingTickerItem, text: e.target.value })}
+                    placeholder="اكتب نص الخبر هنا... مثال: تم إطلاق ميزة التقويم الشهري التفاعلي الجديد في قسم الجدول الدراسي"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-900 outline-none focus:border-rose-500 focus:bg-white transition-all leading-relaxed"
+                  />
+                </div>
+
+                {/* Badge Tag Presets */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    الشارة / التصنيف (اختياري):
+                  </label>
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {['عاجل', 'تنبيه', 'هام', 'جديد', 'إعلان', 'ترحيب'].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setEditingTickerItem({ ...editingTickerItem, badge: preset })}
+                        className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
+                          editingTickerItem.badge === preset
+                            ? 'bg-rose-600 text-white shadow-sm'
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                        }`}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setEditingTickerItem({ ...editingTickerItem, badge: '' })}
+                      className="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    >
+                      بدون شارة
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={editingTickerItem.badge || ''}
+                    onChange={(e) => setEditingTickerItem({ ...editingTickerItem, badge: e.target.value })}
+                    placeholder="أو اكتب تصنيف مخصص..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs"
+                  />
+                </div>
+
+                {/* Optional Action Link */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    رابط عند النقر (اختياري):
+                  </label>
+                  <input
+                    type="text"
+                    value={editingTickerItem.link || ''}
+                    onChange={(e) => setEditingTickerItem({ ...editingTickerItem, link: e.target.value })}
+                    placeholder="رابط خارجي: https://... أو قسم داخلي: schedule أو telegram"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    إذا تركت الرابط فارغاً، سيكون الخبر للعرض فقط دون قابلية النقر.
+                  </p>
+                </div>
+
+                {/* Visible Switch */}
+                <div className="pt-2">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={editingTickerItem.visible !== false}
+                      onChange={(e) => setEditingTickerItem({ ...editingTickerItem, visible: e.target.checked })}
+                      className="w-4 h-4 text-rose-600 rounded"
+                    />
+                    <span>إظهار في شريط الأخبار المتحرك على الفور</span>
+                  </label>
+                </div>
+          </div>
+        </Modal>
+      )}
 
     </div>
   );
