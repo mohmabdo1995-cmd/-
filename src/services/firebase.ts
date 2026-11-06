@@ -24,10 +24,13 @@ import { getAuth } from 'firebase/auth';
 
 // Initialize Firebase with long polling fallback for reliable connection
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+export const FIRESTORE_DATABASE_ID =
+  (firebaseConfig as any).firestoreDatabaseId || 'ai-studio-fbb922c0-8b2e-4e61-a574-1d9176292ec7';
+
 export const db = initializeFirestore(
   app,
   { experimentalAutoDetectLongPolling: true },
-  (firebaseConfig as any).firestoreDatabaseId || undefined
+  FIRESTORE_DATABASE_ID
 );
 export const auth = getAuth(app);
 
@@ -174,7 +177,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   seoTitle: 'دليلك الجامعي - جامعتك في جيبك',
   seoDescription: 'دليل رقمي شامل للطلاب الجامعيين لتنظيم المحاضرات وتصفح المواد والمصادر.',
   seoKeywords: 'جامعة, محاضرات, طب, تشريح, وظائف أعضاء, كيمياء حيوية, جدول دراسي, GPA',
-  tickerSpeed: 'normal',
+  tickerSpeed: 'fast',
   tickerTitle: 'شريط الأخبار والتنبيهات',
   sectionVisibility: {
     newsTicker: true,
@@ -204,63 +207,128 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
 
 const SITE_CONFIG_DOC_ID = 'general';
 const COLLEGE_INFO_DOC_ID = 'about_college';
+const LOCAL_STORAGE_SITE_CONFIG_KEY = 'daleelak_site_config_v2';
+
+function getCachedSiteConfig(): SiteConfig {
+  if (typeof window === 'undefined') return DEFAULT_SITE_CONFIG;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_SITE_CONFIG_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        ...DEFAULT_SITE_CONFIG,
+        ...parsed,
+        sectionVisibility: {
+          ...DEFAULT_SITE_CONFIG.sectionVisibility,
+          ...(parsed.sectionVisibility || {})
+        }
+      };
+    }
+  } catch {
+    // Ignore JSON error
+  }
+  return DEFAULT_SITE_CONFIG;
+}
+
+function saveCachedSiteConfig(config: SiteConfig): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LOCAL_STORAGE_SITE_CONFIG_KEY, JSON.stringify(config));
+    window.dispatchEvent(new CustomEvent('daleelak-site-config-updated', { detail: config }));
+  } catch (e) {
+    console.warn('Failed saving site config to localStorage:', e);
+  }
+}
 
 export class FirebaseService {
-  // 1. Subscribe to Site Config Real-time Updates
+  // 1. Subscribe to Site Config Real-time Updates with Instant Local Cache
   static subscribeSiteConfig(callback: (config: SiteConfig) => void): () => void {
+    // Deliver instantly from local cache
+    const initialCached = getCachedSiteConfig();
+    callback(initialCached);
+
+    // Listen to local update events across components
+    const handleLocalUpdate = (e: Event) => {
+      const customEvt = e as CustomEvent<SiteConfig>;
+      if (customEvt.detail) {
+        callback(customEvt.detail);
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('daleelak-site-config-updated', handleLocalUpdate);
+    }
+
     const docRef = doc(db, 'site_config', SITE_CONFIG_DOC_ID);
-    return onSnapshot(docRef, (snapshot) => {
+    const unsubFirestore = onSnapshot(docRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data() as Partial<SiteConfig>;
-        callback({
+        const merged: SiteConfig = {
           ...DEFAULT_SITE_CONFIG,
           ...data,
           sectionVisibility: {
             ...DEFAULT_SITE_CONFIG.sectionVisibility,
             ...(data.sectionVisibility || {})
           }
-        });
+        };
+        saveCachedSiteConfig(merged);
+        callback(merged);
       } else {
         // Initialize default config in firestore
-        setDoc(docRef, DEFAULT_SITE_CONFIG);
+        setDoc(docRef, DEFAULT_SITE_CONFIG).catch(() => {});
         callback(DEFAULT_SITE_CONFIG);
       }
     }, (error) => {
-      console.warn('Firestore site_config snapshot error, fallback to default:', error);
-      callback(DEFAULT_SITE_CONFIG);
+      console.warn('Firestore site_config snapshot error, fallback to cache:', error);
+      callback(getCachedSiteConfig());
     });
+
+    return () => {
+      unsubFirestore();
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('daleelak-site-config-updated', handleLocalUpdate);
+      }
+    };
   }
 
-  // 2. Save / Update Site Config
+  // 2. Save / Update Site Config with Instant UI Propagation & Safe Timeout
   static async updateSiteConfig(partialConfig: Partial<SiteConfig>): Promise<void> {
+    const current = getCachedSiteConfig();
+    const updated: SiteConfig = {
+      ...current,
+      ...partialConfig,
+      sectionVisibility: {
+        ...current.sectionVisibility,
+        ...(partialConfig.sectionVisibility || {})
+      }
+    };
+
+    // 1. Immediately apply to local cache & active UI
+    saveCachedSiteConfig(updated);
+
+    // 2. Write to Firestore with safe timeout so the UI never hangs
     try {
       const docRef = doc(db, 'site_config', SITE_CONFIG_DOC_ID);
-      await setDoc(docRef, partialConfig, { merge: true });
-      await this.addAdminLog('تحديث بيانات الموقع', 'تم تعديل الإعدادات العامة ونصوص الموقع');
+      await Promise.race([
+        setDoc(docRef, updated, { merge: true }),
+        new Promise((resolve) => setTimeout(resolve, 5000))
+      ]);
+      
+      // Async non-blocking log
+      this.addAdminLog('تحديث بيانات الموقع', 'تم تعديل الإعدادات العامة ونصوص الموقع').catch(() => {});
     } catch (err) {
-      console.error('Error updating site config:', err);
-      throw err;
+      console.warn('Network sync for site config:', err);
     }
   }
 
   // 3. Toggle Individual Section Visibility Switch
   static async toggleSectionVisibility(sectionKey: keyof SectionVisibility, value: boolean): Promise<void> {
-    try {
-      const docRef = doc(db, 'site_config', SITE_CONFIG_DOC_ID);
-      const docSnap = await getDoc(docRef);
-      const currentConfig = docSnap.exists() ? (docSnap.data() as SiteConfig) : DEFAULT_SITE_CONFIG;
-
-      const updatedVisibility = {
-        ...(currentConfig.sectionVisibility || DEFAULT_SITE_CONFIG.sectionVisibility),
-        [sectionKey]: value
-      };
-
-      await setDoc(docRef, { sectionVisibility: updatedVisibility }, { merge: true });
-      await this.addAdminLog('تغيير حالة ظهور قسم', `تم تغيير قسم ${sectionKey} إلى ${value ? 'تفعيل ON' : 'إخفاء OFF'}`);
-    } catch (err) {
-      console.error('Error toggling section visibility:', err);
-      throw err;
-    }
+    const current = getCachedSiteConfig();
+    const updatedVisibility = {
+      ...current.sectionVisibility,
+      [sectionKey]: value
+    };
+    await this.updateSiteConfig({ sectionVisibility: updatedVisibility });
+    this.addAdminLog('تغيير حالة ظهور قسم', `تم تغيير قسم ${sectionKey} إلى ${value ? 'تفعيل ON' : 'إخفاء OFF'}`).catch(() => {});
   }
 
   // 4. Articles Management

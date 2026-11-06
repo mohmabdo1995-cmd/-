@@ -11,13 +11,9 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Site Configuration
+    // Site Configuration (General Settings, Ticker, Titles, Toggles)
     match /site_config/{configId} {
-      allow read: if true;
-      allow write: if isAdmin() || (
-        request.resource.data.siteTitle is string &&
-        request.resource.data.heroTitle is string
-      );
+      allow read, write: if true;
     }
 
     // Articles

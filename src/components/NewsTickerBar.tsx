@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Radio, Sparkles, ExternalLink, Pause, Play, ChevronLeft } from 'lucide-react';
+import { Radio, ExternalLink, Pause, Play } from 'lucide-react';
 import { TickerItem, ActivePage } from '../types';
 import { FirebaseService, SiteConfig } from '../services/firebase';
 
@@ -26,14 +26,14 @@ export const NewsTickerBar: React.FC<NewsTickerBarProps> = ({ siteConfig, onNavi
     return null;
   }
 
-  // Calculate speed duration
-  const speed = siteConfig.tickerSpeed || 'normal';
-  let durationSeconds = 35;
-  if (speed === 'slow') durationSeconds = 55;
-  if (speed === 'fast') durationSeconds = 22;
+  // Increased Speed Configuration: Brisk, lively & responsive
+  const speed = siteConfig.tickerSpeed || 'fast';
+  let secondsPerItem = 3.2; // Fast by default
+  if (speed === 'normal') secondsPerItem = 4.5;
+  if (speed === 'slow') secondsPerItem = 6.8;
 
-  // Adapt duration based on items length to maintain comfortable reading pace
-  const adjustedDuration = Math.max(20, tickerItems.length * (speed === 'slow' ? 14 : speed === 'fast' ? 7 : 10));
+  // Total duration for one loop cycle
+  const adjustedDuration = Math.max(10, Math.round(tickerItems.length * secondsPerItem));
 
   const handleItemClick = (item: TickerItem) => {
     if (!item.link) return;
@@ -62,8 +62,9 @@ export const NewsTickerBar: React.FC<NewsTickerBarProps> = ({ siteConfig, onNavi
     return 'bg-blue-500/20 text-blue-300 border-blue-500/40';
   };
 
-  // Duplicate items twice to ensure unbroken marquee ribbon loop
-  const displayItems = [...tickerItems, ...tickerItems];
+  // Ensure enough items to create a continuous wide ribbon
+  const baseItems = tickerItems.length > 0 ? tickerItems : [];
+  const repeatedItems = baseItems.length < 4 ? [...baseItems, ...baseItems, ...baseItems] : baseItems;
 
   return (
     <div
@@ -102,46 +103,85 @@ export const NewsTickerBar: React.FC<NewsTickerBarProps> = ({ siteConfig, onNavi
           <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-[#071A3D] to-transparent z-10 pointer-events-none"></div>
           <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-[#051430] to-transparent z-10 pointer-events-none"></div>
 
-          {/* Infinite Running Marquee Track */}
+          {/* Continuous Infinite Seamless Loop Track */}
           <div
-            className="animate-ticker flex items-center gap-5 py-0.5 whitespace-nowrap"
+            className="animate-ticker flex items-center shrink-0"
             style={{
               animationPlayState: isPaused ? 'paused' : 'running',
               animationDuration: `${adjustedDuration}s`
             }}
           >
-            {displayItems.map((item, idx) => (
-              <div
-                key={`${item.id}-${idx}`}
-                onClick={() => handleItemClick(item)}
-                className={`flex items-center gap-2 px-1 py-0.5 rounded transition-colors ${
-                  item.link ? 'cursor-pointer hover:bg-white/10 active:scale-98' : ''
-                }`}
-                title={item.link ? 'انقر للانتقال للرابط' : undefined}
-              >
-                {/* Optional Badge */}
-                {item.badge && (
-                  <span className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border leading-none ${getBadgeStyle(item.badge)}`}>
-                    {item.badge}
+            {/* Track 1 */}
+            <div className="flex items-center gap-6 shrink-0 pr-6">
+              {repeatedItems.map((item, idx) => (
+                <div
+                  key={`t1-${item.id}-${idx}`}
+                  onClick={() => handleItemClick(item)}
+                  className={`flex items-center gap-2 px-1 py-0.5 rounded transition-colors ${
+                    item.link ? 'cursor-pointer hover:bg-white/10 active:scale-98' : ''
+                  }`}
+                  title={item.link ? 'انقر للانتقال للرابط' : undefined}
+                >
+                  {/* Optional Badge */}
+                  {item.badge && (
+                    <span className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border leading-none ${getBadgeStyle(item.badge)}`}>
+                      {item.badge}
+                    </span>
+                  )}
+
+                  {/* News Text */}
+                  <span className="text-[11px] sm:text-xs font-medium text-slate-100 group-hover:text-white transition-colors">
+                    {item.text}
                   </span>
-                )}
 
-                {/* News Text */}
-                <span className="text-[11px] sm:text-xs font-medium text-slate-100 group-hover:text-white transition-colors">
-                  {item.text}
-                </span>
+                  {/* Link Indicator if present */}
+                  {item.link && (
+                    <ExternalLink className="w-2.5 h-2.5 text-[#38BDF8] opacity-75 inline" />
+                  )}
 
-                {/* Link Indicator if present */}
-                {item.link && (
-                  <ExternalLink className="w-2.5 h-2.5 text-[#38BDF8] opacity-75 inline" />
-                )}
+                  {/* Separator symbol: ✦ */}
+                  <span className="text-amber-400 font-extrabold text-xs sm:text-sm mr-2.5 drop-shadow-[0_0_5px_rgba(245,158,11,0.6)] select-none">
+                    ✦
+                  </span>
+                </div>
+              ))}
+            </div>
 
-                {/* The required separator symbol: ✦ */}
-                <span className="text-amber-400 font-extrabold text-xs sm:text-sm mr-2.5 drop-shadow-[0_0_5px_rgba(245,158,11,0.6)] select-none">
-                  ✦
-                </span>
-              </div>
-            ))}
+            {/* Track 2 (Identical twin for 100% seamless infinite loop without stutter) */}
+            <div className="flex items-center gap-6 shrink-0 pr-6" aria-hidden="true">
+              {repeatedItems.map((item, idx) => (
+                <div
+                  key={`t2-${item.id}-${idx}`}
+                  onClick={() => handleItemClick(item)}
+                  className={`flex items-center gap-2 px-1 py-0.5 rounded transition-colors ${
+                    item.link ? 'cursor-pointer hover:bg-white/10 active:scale-98' : ''
+                  }`}
+                  title={item.link ? 'انقر للانتقال للرابط' : undefined}
+                >
+                  {/* Optional Badge */}
+                  {item.badge && (
+                    <span className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-full border leading-none ${getBadgeStyle(item.badge)}`}>
+                      {item.badge}
+                    </span>
+                  )}
+
+                  {/* News Text */}
+                  <span className="text-[11px] sm:text-xs font-medium text-slate-100 group-hover:text-white transition-colors">
+                    {item.text}
+                  </span>
+
+                  {/* Link Indicator if present */}
+                  {item.link && (
+                    <ExternalLink className="w-2.5 h-2.5 text-[#38BDF8] opacity-75 inline" />
+                  )}
+
+                  {/* Separator symbol: ✦ */}
+                  <span className="text-amber-400 font-extrabold text-xs sm:text-sm mr-2.5 drop-shadow-[0_0_5px_rgba(245,158,11,0.6)] select-none">
+                    ✦
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -150,7 +190,7 @@ export const NewsTickerBar: React.FC<NewsTickerBarProps> = ({ siteConfig, onNavi
           <button
             onClick={() => setIsPaused(!isPaused)}
             title={isPaused ? 'استئناف الحركة' : 'إيقاف الحركة مؤقتاً'}
-            className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             {isPaused ? <Play className="w-3 h-3 text-emerald-400" /> : <Pause className="w-3 h-3" />}
           </button>

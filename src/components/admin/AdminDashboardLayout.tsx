@@ -853,20 +853,39 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ onCl
                     </div>
 
                     <div className="relative flex-1 flex items-center overflow-hidden">
-                      <div className="animate-ticker flex items-center gap-6 py-1 whitespace-nowrap">
-                        {[...tickerItems, ...tickerItems].filter(i => i.visible !== false).map((item, idx) => (
-                          <div key={`prev-${item.id}-${idx}`} className="flex items-center gap-2">
-                            {item.badge && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                                {item.badge}
+                      <div className="animate-ticker flex items-center shrink-0" style={{ animationDuration: '16s' }}>
+                        {/* Track 1 */}
+                        <div className="flex items-center gap-6 shrink-0 pr-6">
+                          {tickerItems.filter(i => i.visible !== false).map((item, idx) => (
+                            <div key={`prev1-${item.id}-${idx}`} className="flex items-center gap-2">
+                              {item.badge && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                                  {item.badge}
+                                </span>
+                              )}
+                              <span className="text-xs font-medium text-slate-100">{item.text}</span>
+                              <span className="text-amber-400 font-extrabold text-sm mr-2 drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]">
+                                ✦
                               </span>
-                            )}
-                            <span className="text-xs font-medium text-slate-100">{item.text}</span>
-                            <span className="text-amber-400 font-extrabold text-sm mr-2 drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]">
-                              ✦
-                            </span>
-                          </div>
-                        ))}
+                            </div>
+                          ))}
+                        </div>
+                        {/* Track 2 for Seamless Loop */}
+                        <div className="flex items-center gap-6 shrink-0 pr-6" aria-hidden="true">
+                          {tickerItems.filter(i => i.visible !== false).map((item, idx) => (
+                            <div key={`prev2-${item.id}-${idx}`} className="flex items-center gap-2">
+                              {item.badge && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                                  {item.badge}
+                                </span>
+                              )}
+                              <span className="text-xs font-medium text-slate-100">{item.text}</span>
+                              <span className="text-amber-400 font-extrabold text-sm mr-2 drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]">
+                                ✦
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
