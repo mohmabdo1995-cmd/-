@@ -53,23 +53,15 @@ export const Modal: React.FC<ModalProps> = ({
 }) => {
   const backdropRef = useRef<HTMLDivElement>(null);
 
-  // Lock body scroll when modal is open
+  // Lock body scroll when modal is open without creating layout shift or side strips
   useEffect(() => {
     if (!isOpen) return;
 
     const originalOverflow = document.body.style.overflow;
-    const originalPaddingRight = document.body.style.paddingRight;
-    
-    // Calculate scrollbar width to prevent layout shift
-    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-    if (scrollBarWidth > 0) {
-      document.body.style.paddingRight = `${scrollBarWidth}px`;
-    }
     document.body.style.overflow = 'hidden';
 
     return () => {
       document.body.style.overflow = originalOverflow;
-      document.body.style.paddingRight = originalPaddingRight;
     };
   }, [isOpen]);
 
@@ -100,7 +92,7 @@ export const Modal: React.FC<ModalProps> = ({
         <div
           ref={backdropRef}
           onClick={handleBackdropClick}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/70 dark:bg-black/75 backdrop-blur-sm overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden overscroll-contain transition-all"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/70 dark:bg-black/80 backdrop-blur-sm overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:h-0 [&::-webkit-scrollbar-track]:bg-transparent overscroll-contain transition-all"
           dir={dir}
           aria-modal="true"
           role="dialog"
@@ -141,7 +133,7 @@ export const Modal: React.FC<ModalProps> = ({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-600 dark:text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-[#16958E]"
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-600 dark:text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-[#16958E] cursor-pointer"
                     aria-label="إغلاق النافذة"
                     title="إغلاق"
                   >
@@ -151,8 +143,8 @@ export const Modal: React.FC<ModalProps> = ({
               </div>
             )}
 
-            {/* Modal Scrollable Body */}
-            <div className={`flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 overscroll-contain ${bodyClassName}`}>
+            {/* Modal Scrollable Body with clean customized transparent track scrollbars */}
+            <div className={`flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 overscroll-contain [scrollbar-width:thin] [scrollbar-color:#16958E_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-[#16958E]/40 [&::-webkit-scrollbar-thumb]:rounded-full ${bodyClassName}`}>
               {children}
             </div>
 

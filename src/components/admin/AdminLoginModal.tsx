@@ -40,20 +40,27 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onSuccess, onC
     };
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!password) return;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const result = AdminAuthService.login(password);
-    if (result.success) {
-      setErrorMsg(null);
-      onSuccess();
-    } else {
-      setErrorMsg(result.error || 'خطأ في كلمة المرور');
-      if (result.lockoutSeconds && result.lockoutSeconds > 0) {
-        setIsLockedOut(true);
-        setLockoutTimer(result.lockoutSeconds);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      const result = await AdminAuthService.login(password);
+      if (result.success) {
+        setErrorMsg(null);
+        onSuccess();
+      } else {
+        setErrorMsg(result.error || 'خطأ في كلمة المرور');
+        if (result.lockoutSeconds && result.lockoutSeconds > 0) {
+          setIsLockedOut(true);
+          setLockoutTimer(result.lockoutSeconds);
+        }
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -145,10 +152,10 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onSuccess, onC
             </button>
             <button
               type="submit"
-              disabled={isLockedOut || !password}
+              disabled={isLockedOut || !password || isSubmitting}
               className="flex-1 py-3 rounded-2xl bg-[#071A3D] hover:bg-[#16958E] text-white font-bold text-xs shadow-lg shadow-[#071A3D]/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>دخول اللوحة</span>
+              <span>{isSubmitting ? 'جاري التحقق...' : 'دخول اللوحة'}</span>
               <ArrowRight className="w-4 h-4 rotate-180" />
             </button>
           </div>

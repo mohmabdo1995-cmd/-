@@ -13,19 +13,23 @@ import {
   deleteDoc,
   query,
   orderBy,
-  limit
+  limit,
+  writeBatch
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 import { Subject, Lecture, StudyResource, ArticleItem, VideoItem, CollegeInfoData, TickerItem } from '../types';
 import { COLLEGE_INFO, SUBJECTS_DATA, DEFAULT_ARTICLES, DEFAULT_VIDEOS } from '../data/academicContent';
+
+import { getAuth } from 'firebase/auth';
 
 // Initialize Firebase with long polling fallback for reliable connection
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const db = initializeFirestore(
   app,
   { experimentalAutoDetectLongPolling: true },
-  firebaseConfig.firestoreDatabaseId || undefined
+  (firebaseConfig as any).firestoreDatabaseId || undefined
 );
+export const auth = getAuth(app);
 
 // Types for Admin & Dynamic Site Config
 export interface SectionVisibility {
@@ -667,12 +671,107 @@ export class FirebaseService {
     return JSON.stringify(backupPayload, null, 2);
   }
 
-  static async importFullData(jsonString: string): Promise<void> {
-    const parsed = JSON.parse(jsonString);
-    if (parsed.siteConfig) {
-      await this.updateSiteConfig(parsed.siteConfig);
+  static async importFullData(jsonString: string): Promise<{ success: boolean; stats: Record<string, number>; errors: string[] }> {
+    const errors: string[] = [];
+    const stats: Record<string, number> = {
+      siteConfig: 0,
+      articles: 0,
+      videos: 0,
+      tickerItems: 0,
+      announcements: 0,
+      media: 0
+    };
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(jsonString);
+    } catch (e: any) {
+      throw new Error('الملف المرفق غير صالح، يرجى التأكد من اختيار ملف JSON صحيح.');
     }
-    await this.addAdminLog('استعادة نسخة احتياطية', 'تم استيراد نسخة البيانات بنجاح');
+
+    if (!parsed || typeof parsed !== 'object') {
+      throw new Error('بيانات النسخة الاحتياطية فارغة أو غير متوافقة.');
+    }
+
+    // 1. Restore Site Config
+    if (parsed.siteConfig && typeof parsed.siteConfig === 'object') {
+      try {
+        await this.updateSiteConfig(parsed.siteConfig);
+        stats.siteConfig = 1;
+      } catch (err: any) {
+        errors.push(`فشل استعادة الإعدادات العامة: ${err.message}`);
+      }
+    }
+
+    // Helper for safe batch processing (Firestore limit is 500 writes per batch)
+    const restoreCollection = async (
+      collectionName: string,
+      items: any[],
+      statKey: string
+    ) => {
+      if (!Array.isArray(items) || items.length === 0) return;
+
+      const BATCH_SIZE = 400;
+      for (let i = 0; i < items.length; i += BATCH_SIZE) {
+        const chunk = items.slice(i, i + BATCH_SIZE);
+        const batch = writeBatch(db);
+
+        for (const item of chunk) {
+          if (!item || typeof item !== 'object') continue;
+          const { id, ...data } = item;
+          if (id) {
+            const docRef = doc(db, collectionName, String(id));
+            batch.set(docRef, data, { merge: true });
+          } else {
+            const docRef = doc(collection(db, collectionName));
+            batch.set(docRef, data, { merge: true });
+          }
+        }
+
+        try {
+          await batch.commit();
+          stats[statKey] += chunk.length;
+        } catch (err: any) {
+          errors.push(`فشل استعادة دفعة من ${collectionName}: ${err.message}`);
+        }
+      }
+    };
+
+    // 2. Restore Articles
+    if (Array.isArray(parsed.articles)) {
+      await restoreCollection('articles', parsed.articles, 'articles');
+    }
+
+    // 3. Restore Videos
+    if (Array.isArray(parsed.videos)) {
+      await restoreCollection('videos', parsed.videos, 'videos');
+    }
+
+    // 4. Restore Ticker Items
+    if (Array.isArray(parsed.tickerItems)) {
+      await restoreCollection('ticker_items', parsed.tickerItems, 'tickerItems');
+    }
+
+    // 5. Restore Announcements
+    if (Array.isArray(parsed.announcements)) {
+      await restoreCollection('announcements', parsed.announcements, 'announcements');
+    }
+
+    // 6. Restore Media
+    if (Array.isArray(parsed.media)) {
+      await restoreCollection('media', parsed.media, 'media');
+    }
+
+    await this.addAdminLog(
+      'استعادة نسخة احتياطية شاملة',
+      `تم استرجاع: ${stats.articles} مقال، ${stats.videos} فيديو، ${stats.tickerItems} خبر، إعدادات: ${stats.siteConfig}`
+    );
+
+    return {
+      success: errors.length === 0,
+      stats,
+      errors
+    };
   }
 }
 
