@@ -7,8 +7,8 @@
     <meta name="description" content="دليل رقمي متكامل للطلاب الجامعيين لتنظيم الدراسة، الجداول الدراسية، المحاضرات، والمكتبة المرئية" />
     
     <!-- PWA Primary Theme & Background Colors -->
-    <meta name="theme-color" content="#071A3D" />
-    <meta name="background-color" content="#071A3D" />
+    <meta name="theme-color" content="#16958E" />
+    <meta name="background-color" content="#16958E" />
 
     <!-- Apple iOS PWA Capabilities & Splash Screen Support -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -44,7 +44,7 @@
         position: fixed;
         inset: 0;
         z-index: 999999;
-        background: radial-gradient(circle at 50% 38%, #0E2F5A 0%, #071A3D 100%);
+        background: radial-gradient(circle at 50% 35%, #16958E 0%, #0E6863 55%, #083E3B 100%);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -68,9 +68,9 @@
       }
       .splash-logo-container {
         position: relative;
-        width: 104px;
-        height: 104px;
-        margin-bottom: 22px;
+        width: 120px;
+        height: 120px;
+        margin-bottom: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -78,18 +78,20 @@
       }
       .splash-logo-glow {
         position: absolute;
-        inset: -14px;
-        background: radial-gradient(circle, rgba(22, 149, 142, 0.5) 0%, rgba(7, 26, 61, 0) 70%);
+        inset: -16px;
+        background: radial-gradient(circle, rgba(188, 235, 255, 0.55) 0%, rgba(22, 149, 142, 0) 70%);
         border-radius: 50%;
         animation: splashPulse 2.4s ease-in-out infinite alternate;
       }
       .splash-logo-img {
         position: relative;
-        width: 96px;
-        height: 96px;
+        width: 110px;
+        height: 110px;
         object-fit: contain;
-        filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
-        border-radius: 22px;
+        filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.35));
+        border-radius: 26px;
+        background: #ffffff;
+        padding: 4px;
       }
       .splash-title {
         font-size: 26px;
@@ -105,14 +107,14 @@
         font-size: 14px;
         font-weight: 500;
         color: #BCEBFF;
-        opacity: 0.88;
+        opacity: 0.95;
         margin: 0 0 28px 0;
         text-align: center;
       }
       .splash-progress-track {
         width: 160px;
         height: 4px;
-        background: rgba(188, 235, 255, 0.16);
+        background: rgba(255, 255, 255, 0.25);
         border-radius: 999px;
         overflow: hidden;
         position: relative;
@@ -123,14 +125,14 @@
         bottom: 0;
         left: 0;
         width: 45%;
-        background: linear-gradient(90deg, #16958E, #38BDF8, #BCEBFF);
+        background: linear-gradient(90deg, #FFFFFF, #BCEBFF, #FFFFFF);
         border-radius: 999px;
         animation: splashProgress 1.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
       }
       .splash-status {
         margin-top: 14px;
         font-size: 12px;
-        color: #94A3B8;
+        color: #E6FFFA;
         letter-spacing: 0.02em;
         font-weight: 500;
       }
@@ -165,10 +167,10 @@
     <div id="app-splash" aria-label="شاشة التحميل والتجهيز">
       <div class="splash-logo-container">
         <div class="splash-logo-glow"></div>
-        <img src="/pwa-192x192.png" alt="دليلك الجامعي" class="splash-logo-img" width="96" height="96" fetchpriority="high" />
+        <img src="/icon.svg" alt="دليلك الجامعي" class="splash-logo-img" width="110" height="110" fetchpriority="high" />
       </div>
       <h1 class="splash-title">دليلك الجامعي</h1>
-      <p class="splash-tagline">منصتك التعليمية الأكاديمية الشاملة</p>
+      <p class="splash-tagline">جامعة وادي النيل • منصتك التعليمية الشاملة</p>
       <div class="splash-progress-track">
         <div class="splash-progress-bar"></div>
       </div>

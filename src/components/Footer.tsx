@@ -14,8 +14,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Col 1: Brand */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#071A3D] to-[#16958E] text-white flex items-center justify-center font-bold shadow-md">
-                <GraduationCap className="w-6 h-6 stroke-[2.2]" />
+              <div className="w-10 h-10 rounded-2xl bg-white border border-[#16958E]/30 flex items-center justify-center p-0.5 shadow-md overflow-hidden">
+                <img src="/icon.svg" alt="دليلك الجامعي" className="w-full h-full object-contain" />
               </div>
               <h3 className="text-xl font-bold font-tajawal text-[#071A3D] dark:text-white">دليلك الجامعي</h3>
             </div>

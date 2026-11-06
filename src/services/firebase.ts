@@ -14,7 +14,8 @@ import {
   query,
   orderBy,
   limit,
-  writeBatch
+  writeBatch,
+  setLogLevel
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 import { Subject, Lecture, StudyResource, ArticleItem, VideoItem, CollegeInfoData, TickerItem } from '../types';
@@ -22,14 +23,17 @@ import { COLLEGE_INFO, SUBJECTS_DATA, DEFAULT_ARTICLES, DEFAULT_VIDEOS } from '.
 
 import { getAuth } from 'firebase/auth';
 
-// Initialize Firebase with long polling fallback for reliable connection
+// Silence verbose connection notices
+setLogLevel('error');
+
+// Initialize Firebase with direct forced long polling for 100% reliable connection in iframe/proxy environments
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const FIRESTORE_DATABASE_ID =
   (firebaseConfig as any).firestoreDatabaseId || 'ai-studio-fbb922c0-8b2e-4e61-a574-1d9176292ec7';
 
 export const db = initializeFirestore(
   app,
-  { experimentalAutoDetectLongPolling: true },
+  { experimentalForceLongPolling: true },
   FIRESTORE_DATABASE_ID
 );
 export const auth = getAuth(app);

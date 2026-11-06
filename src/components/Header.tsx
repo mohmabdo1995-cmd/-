@@ -26,8 +26,8 @@ export const Header: React.FC<HeaderProps> = ({
           
           {/* Logo & Brand */}
           <div className="flex items-center gap-2 sm:gap-3 cursor-pointer group flex-shrink-0" onClick={() => setActivePage('landing')}>
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-[#071A3D] flex items-center justify-center text-white shadow-md sm:shadow-lg shadow-[#071A3D]/25 group-hover:scale-105 transition-all duration-300 flex-shrink-0">
-              <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2] text-[#BCEBFF]" />
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-white border border-[#16958E]/30 flex items-center justify-center p-0.5 shadow-md sm:shadow-lg shadow-[#071A3D]/10 group-hover:scale-105 transition-all duration-300 flex-shrink-0 overflow-hidden">
+              <img src="/icon.svg" alt="دليلك الجامعي" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col justify-center">
               <h1 className="text-xs sm:text-xl font-bold font-tajawal text-[#071A3D] dark:text-white tracking-tight leading-tight">
